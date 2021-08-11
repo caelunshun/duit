@@ -1,0 +1,19 @@
+name: Todos
+child:
+  Column:
+    align_h: Center
+    align_v: Center
+    children:
+      - Text: "@size{30}{Todos}"
+      - Row:
+          children:
+            - TextInput:
+                id: todo_input
+                placeholder: Add a new todo
+            - Button:
+                id: todo_input_submit
+                child:
+                  Text: "Create"
+      - Column:
+          id: todos_list
+          align_h: Center

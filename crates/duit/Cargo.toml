@@ -1,0 +1,24 @@
+[package]
+name = "duit"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+ahash = "0.7"
+duit-core = { path = "../duit-core" }
+dume-renderer = { git = "https://github.com/caelunshun/dume" }
+glam = "0.17"
+indexmap = { version = "1", features = [ "serde" ] }
+palette = "0.5"
+serde = { version = "1", features = [ "derive" ] }
+serde_yaml = "0.8"
+thiserror = "1"
+winit = { version = "0.25", default-features = false }
+
+[dev-dependencies]
+pollster = "0.2"
+wgpu = "0.9"
+winit = { version = "0.25", default-features = false, features = [ "x11" ] }
+
+[[example]]
+name = "simple"

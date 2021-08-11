@@ -1,0 +1,11 @@
+[package]
+name = "duit-codegen"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+anyhow = "1"
+argh = "0.1"
+duit-core = { path = "../duit-core" }
+quote = "1"
+syn = "1"

@@ -1,0 +1,19 @@
+name: Simple
+child:
+  Column:
+    align_v: Center
+    align_h: Center
+    spacing: 30
+    children:
+      - Text:
+          text: "@size{40}{Here is some text. @color{rgb(200,30,60)}{And it's @color{rgb(30,50,200)}{red} sometimes.}}"
+          id: "the_text"
+      - Row:
+          spacing: 50
+          children:
+            - Text: "@size{24}{Row part #1}"
+            - Text: "@size{24}{@color{rgb(20,200,60)}{Row part #2}}"
+            - Text:
+                text: "@size{24}{Hoverable text}"
+                classes:
+                  - hoverable_text

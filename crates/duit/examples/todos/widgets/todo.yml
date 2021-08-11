@@ -1,0 +1,6 @@
+name: Todo
+child:
+  Container:
+    child:
+      Text:
+        id: "todo_text"
