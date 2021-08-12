@@ -5,7 +5,7 @@ variables:
   text_color: rgb(240, 240, 240)
   emphasis: rgb(252, 76, 2)
   
-  default_font_family: Merriweather
+  default_font_family: Cormorant Garamond
 
 styles:
   text:

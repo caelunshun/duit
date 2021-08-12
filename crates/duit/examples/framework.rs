@@ -70,7 +70,7 @@ impl Example {
         let mut canvas = Canvas::new(Arc::clone(&device), Arc::clone(&queue));
 
         canvas.load_font(
-            fs::read("/Users/caelum/CLionProjects/riposte/assets/font/Merriweather-Regular.ttf")
+            fs::read("assets/CormorantGaramond-Regular.ttf")
                 .unwrap(),
         );
 
