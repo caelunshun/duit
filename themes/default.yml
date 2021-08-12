@@ -1,6 +1,7 @@
 variables:
-  background: rgb(70, 75, 70)
-  active: rgb(100, 110, 100)
+  window: rgb(40, 40, 40)
+  background: rgb(70, 70, 70)
+  active: rgb(100, 105, 100)
   foreground: rgb(160, 170, 160)
   text_color: rgb(240, 240, 240)
   emphasis: rgb(252, 76, 2)
@@ -61,3 +62,9 @@ styles:
     border_width: 1
     border_color: $emphasis
     background_color: $active
+
+  container:
+    border_radius: 1
+    border_width: 0.5
+    background_color: $window
+    border_color: $background

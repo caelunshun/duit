@@ -122,6 +122,7 @@ fn instantiate_widget(
         spec::Widget::TextInput(_) => todo!(),
         spec::Widget::Button(spec) => Box::new(widgets::Button::from_spec(spec)),
         spec::Widget::Image(spec) => Box::new(widgets::Image::from_spec(spec)),
+        spec::Widget::Container(spec) => Box::new(widgets::Container::from_spec(spec)),
     };
 
     let mut pod = WidgetPod::new(widget);
@@ -149,6 +150,7 @@ fn instantiate_widget(
             Some(c) => std::slice::from_ref(&**c),
             None => &[],
         },
+        spec::Widget::Container(s) => std::slice::from_ref(&*s.child),
         _ => &[],
     };
 

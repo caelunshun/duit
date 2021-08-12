@@ -22,6 +22,7 @@ pub enum Widget {
     TextInput(TextInputSpec),
     Button(ButtonSpec),
     Image(ImageSpec),
+    Container(ContainerSpec),
 }
 
 impl Widget {
@@ -45,6 +46,7 @@ impl Widget {
             Widget::TextInput(s) => Some(&s.base),
             Widget::Button(s) => Some(&s.base),
             Widget::Image(s) => Some(&s.base),
+            Widget::Container(s) => Some(&s.base),
         }
     }
 }
@@ -111,4 +113,19 @@ pub struct ImageSpec {
     pub image: Option<String>,
     pub size: Option<f32>,
     pub child: Option<Box<Widget>>,
+}
+
+#[derive(Clone, Copy, Debug, Deserialize)]
+pub enum ContainerMode {
+    Shrink,
+    FillParent,
+    Pad(f32),
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ContainerSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    pub mode: ContainerMode,
+    pub child: Box<Widget>,
 }
