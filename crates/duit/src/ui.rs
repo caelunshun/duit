@@ -1,4 +1,4 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::RefCell,  rc::Rc};
 
 use ahash::AHashMap;
 use duit_core::spec::{self, Spec};
@@ -99,7 +99,7 @@ fn instantiate_widget(
         spec::Widget::Row(spec) => Box::new(widgets::Flex::from_spec(&spec.flex, Axis::Horizontal)),
         spec::Widget::Text(spec) => Box::new(widgets::Text::from_spec(spec)),
         spec::Widget::TextInput(_) => todo!(),
-        spec::Widget::Button(_) => todo!(),
+        spec::Widget::Button(spec) => Box::new(widgets::Button::from_spec(spec)),
     };
 
     let mut pod = WidgetPod::new(widget);
@@ -122,6 +122,7 @@ fn instantiate_widget(
     let children = match spec_widget {
         spec::Widget::Column(s) => s.flex.children.as_slice(),
         spec::Widget::Row(s) => s.flex.children.as_slice(),
+        spec::Widget::Button(s) => std::slice::from_ref(&*s.child),
         _ => &[],
     };
 
@@ -129,6 +130,8 @@ fn instantiate_widget(
         let child = instantiate_widget(child, widgets_with_ids);
         pod.data_mut().add_child(child);
     }
+
+    pod.mount();
 
     let handle = Rc::new(RefCell::new(pod));
 

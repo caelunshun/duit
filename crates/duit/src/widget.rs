@@ -62,6 +62,10 @@ impl WidgetPod {
         }
     }
 
+    pub fn mount(&mut self) {
+        self.widget.mount(&mut self.data);
+    }
+
     pub fn layout(&mut self, parent_cx: &mut Context, max_size: Vec2) {
         let cx = Context {
             canvas: parent_cx.canvas,
@@ -180,6 +184,12 @@ impl Default for WidgetData {
     }
 }
 
+#[derive(Debug)]
+pub enum LayoutStrategy {
+    Shrink { padding: f32 },
+    Fill,
+}
+
 impl WidgetData {
     /// Invokes a closure for each child of this widget.
     ///
@@ -200,6 +210,28 @@ impl WidgetData {
         self.for_each_child(|child| {
             child.paint(cx);
         });
+    }
+
+    /// A convenience method to lay out a single child.
+    ///
+    /// The parameter `strategy` determines how to perform layout:
+    /// * `LayoutStrategy::Shrink` - shrinks the size of this widget to the size of its child
+    /// (optionally with some padding)
+    /// * `LayoutStrategy::Fill` - fill all available space.
+    pub fn lay_out_child(&mut self, strategy: LayoutStrategy, cx: &mut Context, max_size: Vec2) {
+        let mut child = self.children[0].borrow_mut();
+        match strategy {
+            LayoutStrategy::Shrink { padding } => {
+                child.layout(cx, max_size - (padding * 2.));
+                child.data_mut().set_origin(Vec2::splat(padding));
+                self.size = child.data().size() + (padding * 2.);
+            }
+            LayoutStrategy::Fill => {
+                child.layout(cx, max_size);
+                child.data_mut().set_origin(Vec2::ZERO);
+                self.size = max_size;
+            }
+        };
     }
 
     pub fn pass_event_to_children(&mut self, cx: &mut Context, event: &Event) {
@@ -290,6 +322,12 @@ pub trait Widget: AsAny + 'static {
     /// Gets the default style class for this widget.
     fn base_class(&self) -> &str;
 
+    /// Called when the widget is first added to the tree.
+    ///
+    /// The default implementation does nothing.
+    #[allow(unused_variables)]
+    fn mount(&mut self, data: &mut WidgetData) {}
+
     /// Handles an input event.
     ///
     /// The default implementation passes events onto the widget's children.
@@ -323,6 +361,8 @@ pub trait Widget: AsAny + 'static {
 pub trait DynWidget: AsAny + 'static {
     fn base_class(&self) -> &str;
 
+    fn mount(&mut self, data: &mut WidgetData);
+
     fn handle_event(&mut self, data: &mut WidgetData, cx: Context, event: &Event);
 
     fn style_changed(&mut self, data: &mut WidgetData, cx: Context);
@@ -338,6 +378,10 @@ where
 {
     fn base_class(&self) -> &str {
         <T as Widget>::base_class(self)
+    }
+
+    fn mount(&mut self, data: &mut WidgetData) {
+        <T as Widget>::mount(self, data)
     }
 
     fn handle_event(&mut self, data: &mut WidgetData, cx: Context, event: &Event) {

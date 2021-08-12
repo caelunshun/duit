@@ -17,3 +17,8 @@ child:
                 text: "@size{24}{Hoverable text}"
                 classes:
                   - hoverable_text
+      - Button:
+          id: "the_button"
+          child:
+            Text:
+              "A ******"

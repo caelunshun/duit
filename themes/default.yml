@@ -30,38 +30,34 @@ styles:
   text_input:
     border_radius: 2
     cursor_width: 1
-    margin: 5
+    padding: 5
     font: $default_font_family
     font_size: 16
     font_color: $text_color
-    inactive:
-      background_color: $background
-      cursor_color: $foreground
-      border_color: $emphasis
-      border_width: 0
-    active:
-      background_color: $active
-      cursor_color: $foreground
-      border_color: $emphasis
-      border_width: 1
+    background_color: $background
+    cursor_color: $foreground
+    border_color: $emphasis
+    border_width: 0
+
+  text_input & active:
+    background_color: $active
+    cursor_color: $foreground
+    border_color: $emphasis
+    border_width: 1
   
   button:
-    margin: 5
+    padding: 5
     border_radius: 4
-    font: $default_font_family
-    font_size: 16
-    inactive:
-      border_width: 0
-      border_color: $emphasis
-      background_color: $background
-      font_color: $text_color
-    hovered:
-      border_width: 0
-      border_color: $emphasis
-      background_color: $active
-      font_color: $text_color
-    held:
-      border_width: 1 
-      border_color: $emphasis
-      background_color: $active
-      font_color: $text_color
+    border_width: 0
+    border_color: $emphasis
+    background_color: $background
+
+  button & hovered:
+    border_width: 0
+    border_color: $emphasis
+    background_color: $active
+
+  button & pressed:
+    border_width: 1
+    border_color: $emphasis
+    background_color: $active
