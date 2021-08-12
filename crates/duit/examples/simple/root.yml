@@ -21,3 +21,6 @@ child:
           child:
             Text:
               "A ******"
+      - Image:
+          image: ozymandias
+          size: 200

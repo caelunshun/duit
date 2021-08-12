@@ -1,3 +1,5 @@
+use std::fs;
+
 use duit::{widgets::Button, InstanceHandle, Ui, WidgetHandle, WindowPositioner};
 use duit_core::spec::Spec;
 use dume_renderer::Rect;
@@ -40,7 +42,12 @@ enum Message {
 fn main() {
     let mut ui = Ui::new();
 
-    ui.add_spec(Spec::deserialize_from_str(include_str!("root.yml")).unwrap());
+    ui.add_spec(
+        Spec::deserialize_from_str(
+            &fs::read_to_string("crates/duit/examples/simple/root.yml").unwrap(),
+        )
+        .unwrap(),
+    );
 
     let (instance_handle, root) = ui.create_spec_instance::<Simple>();
 

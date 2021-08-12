@@ -1,7 +1,7 @@
 use std::{fs, iter, sync::Arc};
 
 use duit::Ui;
-use dume_renderer::Canvas;
+use dume_renderer::{Canvas, SpriteData, SpriteDescriptor};
 use glam::Vec2;
 use wgpu::{
     BackendBit, Device, Extent3d, Features, Instance, Limits, PresentMode, Surface, SwapChain,
@@ -69,10 +69,11 @@ impl Example {
 
         let mut canvas = Canvas::new(Arc::clone(&device), Arc::clone(&queue));
 
-        canvas.load_font(
-            fs::read("assets/CormorantGaramond-Regular.ttf")
-                .unwrap(),
-        );
+        canvas.load_font(fs::read("assets/CormorantGaramond-Regular.ttf").unwrap());
+        canvas.create_sprite(SpriteDescriptor {
+            name: "ozymandias",
+            data: SpriteData::Encoded(&fs::read("assets/ozymandias.jpeg").unwrap()),
+        });
 
         canvas.set_scale_factor(window.scale_factor());
 

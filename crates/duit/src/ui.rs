@@ -121,6 +121,7 @@ fn instantiate_widget(
         spec::Widget::Text(spec) => Box::new(widgets::Text::from_spec(spec)),
         spec::Widget::TextInput(_) => todo!(),
         spec::Widget::Button(spec) => Box::new(widgets::Button::from_spec(spec)),
+        spec::Widget::Image(spec) => Box::new(widgets::Image::from_spec(spec)),
     };
 
     let mut pod = WidgetPod::new(widget);
@@ -144,6 +145,10 @@ fn instantiate_widget(
         spec::Widget::Column(s) => s.flex.children.as_slice(),
         spec::Widget::Row(s) => s.flex.children.as_slice(),
         spec::Widget::Button(s) => std::slice::from_ref(&*s.child),
+        spec::Widget::Image(s) => match &s.child {
+            Some(c) => std::slice::from_ref(&**c),
+            None => &[],
+        },
         _ => &[],
     };
 
