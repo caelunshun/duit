@@ -89,7 +89,11 @@ impl Example {
         }
     }
 
-    pub fn run(self, mut ui: Ui) {
+    pub fn run<Message, Handler>(self, mut ui: Ui, mut handle_message: Handler)
+    where
+        Handler: FnMut(&Message) + 'static,
+        Message: 'static,
+    {
         ui.add_stylesheet(include_bytes!("../../../themes/default.yml"))
             .unwrap();
         let Self {
@@ -143,7 +147,9 @@ impl Example {
                     ..
                 } => *control_flow = ControlFlow::Exit,
                 Event::WindowEvent { event, .. } => {
-                    ui.handle_window_event(&mut canvas, &event, window.scale_factor())
+                    ui.handle_window_event(&mut canvas, &event, window.scale_factor());
+
+                    ui.handle_messages(|m| handle_message(m));
                 }
                 _ => (),
             }

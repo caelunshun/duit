@@ -1,3 +1,5 @@
+use std::{any::Any, collections::VecDeque};
+
 use dume_renderer::{Canvas, Rect};
 use glam::Vec2;
 
@@ -36,6 +38,7 @@ impl Window {
         &mut self,
         canvas: &mut Canvas,
         style_engine: &mut StyleEngine,
+        messages: &mut VecDeque<Box<dyn Any>>,
         available_space: Vec2,
     ) {
         let layout = self.positioner.compute_position(available_space);
@@ -44,6 +47,7 @@ impl Window {
         let mut cx = Context {
             canvas,
             style_engine,
+            messages,
         };
 
         root.layout(&mut cx, layout.size);
@@ -54,12 +58,14 @@ impl Window {
         &mut self,
         canvas: &mut Canvas,
         style_engine: &mut StyleEngine,
+        messages: &mut VecDeque<Box<dyn Any>>,
         event: &Event,
     ) {
         let mut root = self.root.borrow_mut();
         let mut cx = Context {
             canvas,
             style_engine,
+            messages,
         };
 
         root.handle_event(&mut cx, event);

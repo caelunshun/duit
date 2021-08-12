@@ -1,6 +1,7 @@
 use std::{
     any::Any,
     cell::{Ref, RefCell, RefMut},
+    collections::VecDeque,
     marker::PhantomData,
     rc::Rc,
 };
@@ -70,6 +71,7 @@ impl WidgetPod {
         let cx = Context {
             canvas: parent_cx.canvas,
             style_engine: parent_cx.style_engine,
+            messages: parent_cx.messages,
         };
         self.widget.layout(&mut self.data, cx, max_size);
     }
@@ -80,6 +82,7 @@ impl WidgetPod {
         let cx = Context {
             canvas: parent_cx.canvas,
             style_engine: parent_cx.style_engine,
+            messages: parent_cx.messages,
         };
         self.widget.paint(&mut self.data, cx);
 
@@ -94,6 +97,7 @@ impl WidgetPod {
         let cx = Context {
             canvas: parent_cx.canvas,
             style_engine: parent_cx.style_engine,
+            messages: parent_cx.messages,
         };
         self.widget.handle_event(&mut self.data, cx, &event);
 
@@ -101,6 +105,7 @@ impl WidgetPod {
             let cx = Context {
                 canvas: parent_cx.canvas,
                 style_engine: parent_cx.style_engine,
+                messages: parent_cx.messages,
             };
             self.widget.style_changed(&mut self.data, cx);
             self.data.mark_classes_clean();
@@ -246,6 +251,10 @@ impl WidgetData {
         self.size
     }
 
+    pub fn bounds(&self) -> Rect {
+        Rect::new(Vec2::ZERO, self.size())
+    }
+
     pub fn state(&self) -> WidgetState {
         self.state
     }
@@ -314,6 +323,14 @@ pub struct WidgetState {
 pub struct Context<'a> {
     pub canvas: &'a mut Canvas,
     pub(crate) style_engine: &'a mut StyleEngine,
+    pub(crate) messages: &'a mut VecDeque<Box<dyn Any>>,
+}
+
+impl<'a> Context<'a> {
+    /// Delivers a message to the UI.
+    pub fn send_message(&mut self, message: Box<dyn Any>) {
+        self.messages.push_back(message);
+    }
 }
 
 pub trait Widget: AsAny + 'static {

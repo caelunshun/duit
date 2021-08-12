@@ -16,4 +16,3 @@ child:
                   Text: "Create"
       - Column:
           id: todos_list
-          align_h: Center

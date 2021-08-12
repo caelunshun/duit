@@ -1,4 +1,4 @@
-use duit::{widgets::Text, InstanceHandle, Ui, WidgetHandle, WindowPositioner};
+use duit::{widgets::Button, InstanceHandle, Ui, WidgetHandle, WindowPositioner};
 use duit_core::spec::Spec;
 use dume_renderer::Rect;
 use framework::Example;
@@ -8,7 +8,7 @@ use glam::Vec2;
 mod framework;
 
 struct Simple {
-    _the_text: WidgetHandle<Text>,
+    the_button: WidgetHandle<Button>,
 }
 
 impl InstanceHandle for Simple {
@@ -18,7 +18,7 @@ impl InstanceHandle for Simple {
 
     fn init(mut widget_handles: Vec<(String, duit::WidgetPodHandle)>) -> Self {
         Self {
-            _the_text: WidgetHandle::new(widget_handles.remove(0).1),
+            the_button: WidgetHandle::new(widget_handles.remove(0).1),
         }
     }
 }
@@ -33,14 +33,25 @@ impl WindowPositioner for Positioner {
     }
 }
 
+enum Message {
+    ButtonPressed,
+}
+
 fn main() {
     let mut ui = Ui::new();
 
     ui.add_spec(Spec::deserialize_from_str(include_str!("root.yml")).unwrap());
 
-    let (_instance_handle, root) = ui.create_spec_instance::<Simple>();
+    let (instance_handle, root) = ui.create_spec_instance::<Simple>();
+
+    instance_handle
+        .the_button
+        .get_mut()
+        .on_click(|| Message::ButtonPressed);
 
     ui.create_window(root, Positioner, 1);
 
-    Example::new().run(ui);
+    Example::new().run(ui, |message: &Message| match message {
+        Message::ButtonPressed => println!("Clicked!"),
+    });
 }

@@ -1,16 +1,32 @@
+use std::any::Any;
+
 use duit_core::spec::widgets::ButtonSpec;
 use glam::Vec2;
+use winit::event::MouseButton;
 
 use crate::{
     widget::{Context, LayoutStrategy},
-    Color, Widget, WidgetData,
+    Color, Event, Widget, WidgetData,
 };
 
-pub struct Button {}
+pub struct Button {
+    on_click: Option<Box<dyn FnMut() -> Box<dyn Any>>>,
+}
 
 impl Button {
     pub fn from_spec(_spec: &ButtonSpec) -> Self {
-        Self {}
+        Self { on_click: None }
+    }
+
+    /// Causes a message to be sent when the button is clicked.
+    ///
+    /// If an `on_click` message is already set, it is overriden.
+    pub fn on_click<Message: 'static>(
+        &mut self,
+        mut message: impl FnMut() -> Message + 'static,
+    ) -> &mut Self {
+        self.on_click = Some(Box::new(move || Box::new(message())));
+        self
     }
 }
 
@@ -60,5 +76,19 @@ impl Widget for Button {
             .stroke();
 
         data.paint_children(&mut cx);
+    }
+
+    fn handle_event(&mut self, data: &mut WidgetData, mut cx: Context, event: &Event) {
+        if let Some(on_click) = self.on_click.as_mut() {
+            if let Event::MousePress {
+                button: MouseButton::Left,
+                pos,
+            } = event
+            {
+                if data.bounds().contains(*pos) {
+                    cx.send_message((*on_click)());
+                }
+            }
+        }
     }
 }

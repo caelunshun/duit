@@ -7,7 +7,6 @@ child:
     children:
       - Text:
           text: "@size{40}{Here is some text. @color{rgb(200,30,60)}{And it's @color{rgb(30,50,200)}{red} sometimes.}}"
-          id: "the_text"
       - Row:
           spacing: 50
           children:

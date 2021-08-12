@@ -1,4 +1,4 @@
-use std::{cell::RefCell,  rc::Rc};
+use std::{any::Any, cell::RefCell, collections::VecDeque, rc::Rc};
 
 use ahash::AHashMap;
 use duit_core::spec::{self, Spec};
@@ -22,6 +22,7 @@ pub struct Ui {
     specs: AHashMap<String, Spec>,
     style_engine: StyleEngine,
     event_tracker: EventTracker,
+    messages: VecDeque<Box<dyn Any>>,
 }
 
 impl Ui {
@@ -66,7 +67,12 @@ impl Ui {
 
     pub fn render(&mut self, canvas: &mut Canvas, window_logical_size: Vec2) {
         for window in &mut self.windows {
-            window.render(canvas, &mut self.style_engine, window_logical_size);
+            window.render(
+                canvas,
+                &mut self.style_engine,
+                &mut self.messages,
+                window_logical_size,
+            );
         }
     }
 
@@ -78,9 +84,24 @@ impl Ui {
     ) {
         if let Some(event) = self.event_tracker.handle_event(event, window_scale_factor) {
             for window in &mut self.windows {
-                window.handle_event(canvas, &mut self.style_engine, &event);
+                window.handle_event(canvas, &mut self.style_engine, &mut self.messages, &event);
             }
         }
+    }
+
+    /// Invokes `callback` on all messages with a given type.
+    /// Drains the messages.
+    ///
+    /// Skips any messages with a type other than `T`.
+    pub fn handle_messages<T: 'static>(&mut self, mut callback: impl FnMut(&T)) {
+        self.messages.retain(|message| {
+            if let Some(message) = message.downcast_ref::<T>() {
+                callback(message);
+                false // delete message - it was handled
+            } else {
+                true // keep message - unhandled
+            }
+        });
     }
 
     fn sort_windows(&mut self) {
