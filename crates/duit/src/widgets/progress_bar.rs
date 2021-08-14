@@ -107,5 +107,7 @@ impl Widget for ProgressBar {
             .solid_color(style.border_color.into())
             .stroke_width(style.border_width)
             .stroke();
+
+        data.paint_children(&mut cx);
     }
 }
