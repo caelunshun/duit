@@ -68,3 +68,11 @@ styles:
     border_width: 0.5
     background_color: $window
     border_color: $background
+
+  progress_bar:
+    border_radius: 1
+    border_width: 1
+    border_color: rgb(0, 0, 0)
+    background_color: $background
+    progress_color: rgb(91, 197, 0)
+    projected_progress_color: rgb(62, 154, 44)

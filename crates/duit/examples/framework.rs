@@ -1,4 +1,4 @@
-use std::{fs, iter, sync::Arc};
+use std::{fs, iter, sync::Arc, time::Instant};
 
 use duit::Ui;
 use dume_renderer::{Canvas, SpriteData, SpriteDescriptor};
@@ -90,8 +90,12 @@ impl Example {
         }
     }
 
-    pub fn run<Message, Handler>(self, mut ui: Ui, mut handle_message: Handler)
-    where
+    pub fn run<Message, Handler>(
+        self,
+        mut ui: Ui,
+        mut handle_message: Handler,
+        mut tick: impl FnMut(&mut Ui, f32) + 'static,
+    ) where
         Handler: FnMut(&Message) + 'static,
         Message: 'static,
     {
@@ -108,6 +112,7 @@ impl Example {
             mut swap_chain_desc,
             mut sample_texture,
         } = self;
+        let mut previous_time = Instant::now();
         event_loop.run(move |event, _, control_flow| {
             *control_flow = ControlFlow::Wait;
 
@@ -117,6 +122,10 @@ impl Example {
             );
             match event {
                 Event::RedrawRequested(_) => {
+                    let dt = previous_time.elapsed();
+                    tick(&mut ui, dt.as_secs_f32());
+                    previous_time = Instant::now();
+
                     ui.render(&mut canvas, window_logical_size);
                     let frame = swap_chain
                         .get_current_frame()

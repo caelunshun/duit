@@ -113,7 +113,7 @@ fn instantiate_widget(
     spec_widget: &spec::Widget,
     widgets_with_ids: &mut Vec<(String, WidgetPodHandle)>,
 ) -> WidgetPodHandle {
-    let widget: Box<dyn DynWidget> = match &spec_widget {
+    let widget: Box<dyn DynWidget> = match spec_widget {
         spec::Widget::Column(spec) => {
             Box::new(widgets::Flex::from_spec(&spec.flex, Axis::Vertical))
         }
@@ -123,6 +123,8 @@ fn instantiate_widget(
         spec::Widget::Button(spec) => Box::new(widgets::Button::from_spec(spec)),
         spec::Widget::Image(spec) => Box::new(widgets::Image::from_spec(spec)),
         spec::Widget::Container(spec) => Box::new(widgets::Container::from_spec(spec)),
+        spec::Widget::ProgressBar(spec) => Box::new(widgets::ProgressBar::from_spec(spec)),
+        
     };
 
     let mut pod = WidgetPod::new(widget);

@@ -45,7 +45,18 @@ fn main() {
 
     ui.create_window(root, Positioner, 1);
 
-    Example::new().run(ui, |message: &Message| match message {
-        Message::ButtonPressed => println!("Clicked!"),
-    });
+    let mut time = 0.0;
+    Example::new().run(
+        ui,
+        |message: &Message| match message {
+            Message::ButtonPressed => println!("Clicked!"),
+        },
+        move |_, dt| {
+            time += dt;
+            instance_handle
+                .progress_bar
+                .get_mut()
+                .set_progress((time.sin() + 1.0) / 2.0);
+        },
+    );
 }

@@ -26,3 +26,9 @@ child:
           - Image:
               image: ozymandias
               size: 200
+          - ProgressBar:
+              id: progress_bar
+              width: 200
+              height: 10
+              child:
+                Text: Progress

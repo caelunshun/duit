@@ -25,6 +25,7 @@ pub enum Widget {
     Button(ButtonSpec),
     Image(ImageSpec),
     Container(ContainerSpec),
+    ProgressBar(ProgressBarSpec),
 }
 
 impl Widget {
@@ -49,6 +50,7 @@ impl Widget {
             Widget::Button(s) => Some(&s.base),
             Widget::Image(s) => Some(&s.base),
             Widget::Container(s) => Some(&s.base),
+            Widget::ProgressBar(s) => Some(&s.base),
         }
     }
 
@@ -62,6 +64,10 @@ impl Widget {
                 None => &[],
             },
             Widget::Container(s) => slice::from_ref(&*s.child),
+            Widget::ProgressBar(s) => match &s.child {
+                Some(c) => std::slice::from_ref(&**c),
+                None => &[],
+            },
             _ => &[],
         }
     }
@@ -75,6 +81,7 @@ impl Widget {
             Widget::Button(_) => "Button",
             Widget::Image(_) => "Image",
             Widget::Container(_) => "Container",
+            Widget::ProgressBar(_) => "ProgressBar",
         }
     }
 }
@@ -156,4 +163,13 @@ pub struct ContainerSpec {
     pub base: BaseSpec,
     pub mode: ContainerMode,
     pub child: Box<Widget>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ProgressBarSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    pub width: Option<f32>,
+    pub height: Option<f32>,
+    pub child: Option<Box<Widget>>,
 }
