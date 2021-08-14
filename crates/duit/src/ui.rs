@@ -27,7 +27,10 @@ pub struct Ui {
 
 impl Ui {
     pub fn new() -> Self {
-        Self::default()
+        let mut u = Self::default();
+        u.add_stylesheet(include_bytes!("../../../themes/default.yml"))
+            .expect("invalid default theme");
+        u
     }
 
     pub fn add_spec(&mut self, spec: Spec) -> &mut Self {
@@ -124,7 +127,6 @@ fn instantiate_widget(
         spec::Widget::Image(spec) => Box::new(widgets::Image::from_spec(spec)),
         spec::Widget::Container(spec) => Box::new(widgets::Container::from_spec(spec)),
         spec::Widget::ProgressBar(spec) => Box::new(widgets::ProgressBar::from_spec(spec)),
-        
     };
 
     let mut pod = WidgetPod::new(widget);
