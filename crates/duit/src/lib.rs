@@ -14,3 +14,6 @@ pub use color::Color;
 pub use widget::{Widget, WidgetData, WidgetHandle, WidgetPodHandle, WidgetState};
 pub use window::WindowPositioner;
 pub use event::Event;
+
+pub use glam::Vec2;
+pub use dume_renderer::Rect;
