@@ -22,8 +22,7 @@ child:
           - Button:
               id: "the_button"
               child:
-                Text:
-                  "A ******"
+                Text: "Click Me"
           - Image:
               image: ozymandias
               size: 200

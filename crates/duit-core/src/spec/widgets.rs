@@ -1,5 +1,7 @@
 //! Specs for each widget.
 
+use std::slice;
+
 use serde::Deserialize;
 
 use crate::Align;
@@ -47,6 +49,32 @@ impl Widget {
             Widget::Button(s) => Some(&s.base),
             Widget::Image(s) => Some(&s.base),
             Widget::Container(s) => Some(&s.base),
+        }
+    }
+
+    pub fn children(&self) -> &[Widget] {
+        match self {
+            Widget::Column(s) => s.flex.children.as_slice(),
+            Widget::Row(s) => s.flex.children.as_slice(),
+            Widget::Button(s) => slice::from_ref(&*s.child),
+            Widget::Image(s) => match &s.child {
+                Some(c) => std::slice::from_ref(&**c),
+                None => &[],
+            },
+            Widget::Container(s) => slice::from_ref(&*s.child),
+            _ => &[],
+        }
+    }
+
+    pub fn type_name(&self) -> &'static str {
+        match self {
+            Widget::Column(_) => "Flex",
+            Widget::Row(_) => "Flex",
+            Widget::Text(_) => "Text",
+            Widget::TextInput(_) => "TextInput",
+            Widget::Button(_) => "Button",
+            Widget::Image(_) => "Image",
+            Widget::Container(_) => "Container",
         }
     }
 }

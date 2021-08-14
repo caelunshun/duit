@@ -142,17 +142,7 @@ fn instantiate_widget(
     pod.data_mut().mark_classes_clean();
 
     // Inflate children recursively.
-    let children = match spec_widget {
-        spec::Widget::Column(s) => s.flex.children.as_slice(),
-        spec::Widget::Row(s) => s.flex.children.as_slice(),
-        spec::Widget::Button(s) => std::slice::from_ref(&*s.child),
-        spec::Widget::Image(s) => match &s.child {
-            Some(c) => std::slice::from_ref(&**c),
-            None => &[],
-        },
-        spec::Widget::Container(s) => std::slice::from_ref(&*s.child),
-        _ => &[],
-    };
+    let children = spec_widget.children();
 
     for child in children {
         let child = instantiate_widget(child, widgets_with_ids);

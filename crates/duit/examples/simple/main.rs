@@ -1,29 +1,16 @@
 use std::fs;
 
-use duit::{widgets::Button, InstanceHandle, Ui, WidgetHandle, WindowPositioner};
+use duit::{Ui, WindowPositioner};
 use duit_core::spec::Spec;
 use dume_renderer::Rect;
 use framework::Example;
 use glam::Vec2;
 
+use crate::generated::Simple;
+
 #[path = "../framework.rs"]
 mod framework;
-
-struct Simple {
-    the_button: WidgetHandle<Button>,
-}
-
-impl InstanceHandle for Simple {
-    fn name() -> &'static str {
-        "Simple"
-    }
-
-    fn init(mut widget_handles: Vec<(String, duit::WidgetPodHandle)>) -> Self {
-        Self {
-            the_button: WidgetHandle::new(widget_handles.remove(0).1),
-        }
-    }
-}
+mod generated;
 
 struct Positioner;
 impl WindowPositioner for Positioner {
