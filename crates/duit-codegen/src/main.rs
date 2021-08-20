@@ -3,7 +3,7 @@ use duit_core::spec::{Spec, Widget};
 use proc_macro2::Span;
 use quote::quote;
 use std::{
-    fs,
+    fs::{self, OpenOptions},
     io::{Read, Write},
     path::PathBuf,
     process::{Command, Stdio},
@@ -19,6 +19,9 @@ pub struct Args {
     #[argh(option, short = 'o')]
     /// output Rust file
     output: PathBuf,
+    #[argh(switch)]
+    /// whether to append to instead of overwrite the output file
+    append: bool,
 }
 
 fn main() -> anyhow::Result<()> {
@@ -28,7 +31,11 @@ fn main() -> anyhow::Result<()> {
     let code = generate_code(&spec);
     let code = rustfmt(&code)?;
 
-    fs::write(args.output, code)?;
+    let mut output_file = OpenOptions::new()
+        .append(args.append)
+        .create(true)
+        .open(args.output)?;
+    output_file.write_all(code.as_bytes())?;
 
     Ok(())
 }
@@ -70,7 +77,7 @@ fn generate_code(spec: &Spec) -> String {
 
     let tokens = quote! {
         use ::duit::widgets::*;
-        use ::duit::{WidgetPodHandle, WidgetHandle};
+        use ::duit::*;
 
         pub struct #ident {
             #(#struct_fields,)*

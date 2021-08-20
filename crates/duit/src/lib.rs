@@ -9,7 +9,7 @@ mod color;
 
 pub use spec::InstanceHandle;
 pub use style::StyleError;
-pub use ui::Ui;
+pub use ui::{Ui, WindowId};
 pub use color::Color;
 pub use widget::{Widget, WidgetData, WidgetHandle, WidgetPodHandle, WidgetState};
 pub use window::WindowPositioner;

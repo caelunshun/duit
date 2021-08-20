@@ -1,24 +1,24 @@
 use std::any::Any;
 
-use duit_core::spec::widgets::ButtonSpec;
+use duit_core::spec::widgets::ClickableSpec;
 use glam::Vec2;
 use winit::event::MouseButton;
 
 use crate::{
     widget::{Context, LayoutStrategy},
-    Color, Event, Widget, WidgetData,
+    Event, Widget, WidgetData,
 };
 
-pub struct Button {
+pub struct Clickable {
     on_click: Option<Box<dyn FnMut() -> Box<dyn Any>>>,
 }
 
-impl Button {
-    pub fn from_spec(_spec: &ButtonSpec) -> Self {
+impl Clickable {
+    pub fn from_spec(_s: &ClickableSpec) -> Self {
         Self { on_click: None }
     }
 
-    /// Causes a message to be sent when the button is clicked.
+    /// Causes a message to be sent when the widget is clicked.
     ///
     /// If an `on_click` message is already set, it is overriden.
     pub fn on_click<Message: 'static>(
@@ -30,50 +30,24 @@ impl Button {
     }
 }
 
-#[derive(Debug, serde::Deserialize)]
-pub struct Style {
-    padding: f32,
-    border_radius: f32,
-    border_width: f32,
-    border_color: Color,
-    background_color: Color,
-}
-
-impl Widget for Button {
-    type Style = Style;
+impl Widget for Clickable {
+    type Style = ();
 
     fn base_class(&self) -> &str {
-        "button"
+        "clickable"
     }
 
     fn layout(
         &mut self,
-        style: &Self::Style,
+        _style: &Self::Style,
         data: &mut WidgetData,
         mut cx: Context,
         max_size: Vec2,
     ) {
-        data.lay_out_child(
-            LayoutStrategy::Shrink,
-            style.padding,
-            &mut cx,
-            max_size,
-        );
+        data.lay_out_child(LayoutStrategy::Shrink,0., &mut cx, max_size);
     }
 
-    fn paint(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
-        let canvas = &mut cx.canvas;
-
-        canvas
-            .begin_path()
-            .rounded_rect(Vec2::ZERO, data.size(), style.border_radius)
-            .solid_color(style.background_color.into())
-            .fill();
-        canvas
-            .solid_color(style.border_color.into())
-            .stroke_width(style.border_width)
-            .stroke();
-
+    fn paint(&mut self, _style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
         data.paint_children(&mut cx);
     }
 
@@ -89,5 +63,7 @@ impl Widget for Button {
                 }
             }
         }
+
+        data.pass_event_to_children(&mut cx, event);
     }
 }

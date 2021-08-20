@@ -191,7 +191,7 @@ impl Default for WidgetData {
 
 #[derive(Debug)]
 pub enum LayoutStrategy {
-    Shrink { padding: f32 },
+    Shrink,
     Fill,
 }
 
@@ -223,17 +223,17 @@ impl WidgetData {
     /// * `LayoutStrategy::Shrink` - shrinks the size of this widget to the size of its child
     /// (optionally with some padding)
     /// * `LayoutStrategy::Fill` - fill all available space.
-    pub fn lay_out_child(&mut self, strategy: LayoutStrategy, cx: &mut Context, max_size: Vec2) {
+    pub fn lay_out_child(&mut self, strategy: LayoutStrategy, padding: f32, cx: &mut Context, max_size: Vec2) {
         let mut child = self.children[0].borrow_mut();
         match strategy {
-            LayoutStrategy::Shrink { padding } => {
+            LayoutStrategy::Shrink  => {
                 child.layout(cx, max_size - (padding * 2.));
                 child.data_mut().set_origin(Vec2::splat(padding));
                 self.size = child.data().size() + (padding * 2.);
             }
             LayoutStrategy::Fill => {
-                child.layout(cx, max_size);
-                child.data_mut().set_origin(Vec2::ZERO);
+                child.layout(cx, max_size - (padding * 2.));
+                child.data_mut().set_origin(Vec2::splat(padding));
                 self.size = max_size;
             }
         };
@@ -281,6 +281,10 @@ impl WidgetData {
 
     pub fn remove_child(&mut self, index: usize) {
         self.children.remove(index);
+    }
+
+    pub fn clear_children(&mut self) {
+        self.children.clear();
     }
 
     pub(crate) fn set_flex(&mut self, flex: Option<f32>) {

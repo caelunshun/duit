@@ -5,3 +5,5 @@ members = [
     "crates/duit-core",
     "crates/duit-platform"
 ]
+
+resolver = "2"

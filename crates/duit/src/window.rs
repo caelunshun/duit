@@ -23,6 +23,7 @@ pub(crate) struct Window {
     root: WidgetPodHandle,
     positioner: Box<dyn WindowPositioner>,
     pub(crate) z_index: u64,
+    hidden: bool,
 }
 
 impl Window {
@@ -31,6 +32,7 @@ impl Window {
             root,
             positioner: Box::new(positioner),
             z_index,
+            hidden: false,
         }
     }
 
@@ -41,6 +43,10 @@ impl Window {
         messages: &mut VecDeque<Box<dyn Any>>,
         available_space: Vec2,
     ) {
+        if self.hidden {
+            return;
+        }
+
         let layout = self.positioner.compute_position(available_space);
 
         let mut root = self.root.borrow_mut();
@@ -50,8 +56,12 @@ impl Window {
             messages,
         };
 
+        cx.canvas.translate(layout.pos);
+
         root.layout(&mut cx, layout.size);
         root.paint(&mut cx);
+
+        cx.canvas.reset_transform();
     }
 
     pub fn handle_event(
@@ -60,6 +70,7 @@ impl Window {
         style_engine: &mut StyleEngine,
         messages: &mut VecDeque<Box<dyn Any>>,
         event: &Event,
+        available_space: Vec2,
     ) {
         let mut root = self.root.borrow_mut();
         let mut cx = Context {
@@ -68,6 +79,12 @@ impl Window {
             messages,
         };
 
-        root.handle_event(&mut cx, event);
+        let event = event.translated(-self.positioner.compute_position(available_space).pos);
+
+        root.handle_event(&mut cx, &event);
+    }
+
+    pub fn hide(&mut self) {
+        self.hidden = true;
     }
 }

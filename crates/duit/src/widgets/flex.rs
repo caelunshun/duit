@@ -16,6 +16,7 @@ enum ChildUpdate {
     Add(WidgetPodHandle),
     Insert(WidgetPodHandle, usize),
     Remove(usize),
+    Clear,
 }
 
 /// A widget that lays out its children according to a flexbox model.
@@ -62,12 +63,18 @@ impl Flex {
         self
     }
 
+    pub fn clear_children(&mut self) -> &mut Self {
+        self.queued_child_updates.push(ChildUpdate::Clear);
+        self
+    }
+
     fn process_queued_child_updates(&mut self, data: &mut WidgetData) {
         for update in self.queued_child_updates.drain(..) {
             match update {
                 ChildUpdate::Add(widget) => data.add_child(widget),
                 ChildUpdate::Insert(widget, index) => data.insert_child(widget, index),
                 ChildUpdate::Remove(index) => data.remove_child(index),
+                ChildUpdate::Clear => data.clear_children(),
             }
         }
     }

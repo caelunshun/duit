@@ -38,12 +38,13 @@ impl Widget for Container {
         mut cx: Context,
         max_size: Vec2,
     ) {
-        let strategy = match self.mode {
-            ContainerMode::Shrink => LayoutStrategy::Shrink { padding: 0.0 },
-            ContainerMode::FillParent => LayoutStrategy::Fill,
-            ContainerMode::Pad(padding) => LayoutStrategy::Shrink { padding },
+        let (strategy, padding) = match self.mode {
+            ContainerMode::Shrink => (LayoutStrategy::Shrink, 0.),
+            ContainerMode::FillParent => (LayoutStrategy::Fill, 0.),
+            ContainerMode::FillParentAndPad(padding) => (LayoutStrategy::Fill, padding),
+            ContainerMode::Pad(padding) => (LayoutStrategy::Shrink, padding),
         };
-        data.lay_out_child(strategy, &mut cx, max_size);
+        data.lay_out_child(strategy, padding, &mut cx, max_size);
     }
 
     fn paint(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {

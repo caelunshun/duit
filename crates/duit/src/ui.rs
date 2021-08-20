@@ -4,6 +4,7 @@ use ahash::AHashMap;
 use duit_core::spec::{self, Spec};
 use dume_renderer::Canvas;
 use glam::Vec2;
+use slotmap::SlotMap;
 use winit::event::WindowEvent;
 
 use crate::{
@@ -15,10 +16,15 @@ use crate::{
     window::{Window, WindowPositioner},
 };
 
+slotmap::new_key_type! {
+    pub struct WindowId;
+}
+
 /// Contains the entire UI state, including all windows and their widget trees.
 #[derive(Default)]
 pub struct Ui {
-    windows: Vec<Window>,
+    windows: SlotMap<WindowId, Window>,
+    sorted_windows: Vec<WindowId>,
     specs: AHashMap<String, Spec>,
     style_engine: StyleEngine,
     event_tracker: EventTracker,
@@ -63,13 +69,24 @@ impl Ui {
         root: WidgetPodHandle,
         positioner: impl WindowPositioner,
         z_index: u64,
-    ) {
-        self.windows.push(Window::new(root, positioner, z_index));
+    ) -> WindowId {
+        let id = self.windows.insert(Window::new(root, positioner, z_index));
+        self.sorted_windows.push(id);
         self.sort_windows();
+        id
+    }
+
+    pub fn hide_window(&mut self, id: WindowId) {
+        self.windows[id].hide();
+    }
+
+    pub fn close_window(&mut self, id: WindowId) {
+        self.windows.remove(id);
     }
 
     pub fn render(&mut self, canvas: &mut Canvas, window_logical_size: Vec2) {
-        for window in &mut self.windows {
+        for id in &self.sorted_windows {
+            let window = &mut self.windows[*id];
             window.render(
                 canvas,
                 &mut self.style_engine,
@@ -84,10 +101,17 @@ impl Ui {
         canvas: &mut Canvas,
         event: &WindowEvent,
         window_scale_factor: f64,
+        window_logical_size: Vec2,
     ) {
         if let Some(event) = self.event_tracker.handle_event(event, window_scale_factor) {
-            for window in &mut self.windows {
-                window.handle_event(canvas, &mut self.style_engine, &mut self.messages, &event);
+            for (_, window) in &mut self.windows {
+                window.handle_event(
+                    canvas,
+                    &mut self.style_engine,
+                    &mut self.messages,
+                    &event,
+                    window_logical_size,
+                );
             }
         }
     }
@@ -108,7 +132,9 @@ impl Ui {
     }
 
     fn sort_windows(&mut self) {
-        self.windows.sort_by_key(|w| w.z_index)
+        let windows = &self.windows;
+        self.sorted_windows.retain(|w| windows.contains_key(*w));
+        self.sorted_windows.sort_by_key(|w| windows[*w].z_index)
     }
 }
 
@@ -127,6 +153,7 @@ fn instantiate_widget(
         spec::Widget::Image(spec) => Box::new(widgets::Image::from_spec(spec)),
         spec::Widget::Container(spec) => Box::new(widgets::Container::from_spec(spec)),
         spec::Widget::ProgressBar(spec) => Box::new(widgets::ProgressBar::from_spec(spec)),
+        spec::Widget::Clickable(spec) => Box::new(widgets::Clickable::from_spec(spec)),
     };
 
     let mut pod = WidgetPod::new(widget);

@@ -26,6 +26,7 @@ pub enum Widget {
     Image(ImageSpec),
     Container(ContainerSpec),
     ProgressBar(ProgressBarSpec),
+    Clickable(ClickableSpec),
 }
 
 impl Widget {
@@ -51,6 +52,7 @@ impl Widget {
             Widget::Image(s) => Some(&s.base),
             Widget::Container(s) => Some(&s.base),
             Widget::ProgressBar(s) => Some(&s.base),
+            Widget::Clickable(s) => Some(&s.base),
         }
     }
 
@@ -68,6 +70,7 @@ impl Widget {
                 Some(c) => std::slice::from_ref(&**c),
                 None => &[],
             },
+            Widget::Clickable(s) => slice::from_ref(&*s.child),
             _ => &[],
         }
     }
@@ -82,6 +85,7 @@ impl Widget {
             Widget::Image(_) => "Image",
             Widget::Container(_) => "Container",
             Widget::ProgressBar(_) => "ProgressBar",
+            Widget::Clickable(_) => "Clickable",
         }
     }
 }
@@ -155,6 +159,7 @@ pub enum ContainerMode {
     Shrink,
     FillParent,
     Pad(f32),
+    FillParentAndPad(f32),
 }
 
 #[derive(Debug, Deserialize)]
@@ -172,4 +177,11 @@ pub struct ProgressBarSpec {
     pub width: Option<f32>,
     pub height: Option<f32>,
     pub child: Option<Box<Widget>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ClickableSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    pub child: Box<Widget>,
 }
