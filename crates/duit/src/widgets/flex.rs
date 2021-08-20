@@ -159,6 +159,8 @@ impl Widget for Flex {
             cursor += self.spacing;
         });
 
+        let mut offset = Vec2::splat(f32::INFINITY);
+
         // Apply alignment - along both the main and cross axes.
         data.for_each_child(|child| {
             let mut origin = child.data().origin();
@@ -183,7 +185,18 @@ impl Widget for Flex {
             }
 
             child.data_mut().set_origin(origin);
+
+            if origin.x < offset.x { offset.x = origin.x; }
+            if origin.y < offset.y { offset.y = origin.y; }
         });
+
+        if offset.x.is_infinite() {
+            offset.x = 0.0;
+        }
+        if offset.y.is_infinite() {
+            offset.y = 0.0;
+        }
+        data.set_offset(offset);
 
         let mut size = Vec2::ZERO;
         size[main_axis] = cursor;

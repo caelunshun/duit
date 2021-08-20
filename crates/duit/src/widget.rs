@@ -74,6 +74,10 @@ impl WidgetPod {
             messages: parent_cx.messages,
         };
         self.widget.layout(&mut self.data, cx, max_size);
+        
+        if let Some(first_child) = self.data.children.get(0) {
+            self.data.child_offset = first_child.borrow().data().offset();
+        }
     }
 
     pub fn paint(&mut self, parent_cx: &mut Context) {
@@ -161,6 +165,10 @@ pub struct WidgetData {
     children: Vec<WidgetPodHandle>,
     /// The origin of the widget's coordinate space, relative to the parent's coordinate space
     origin: Vec2,
+    /// The offset of the widget from its top-left position in its parent.
+    offset: Vec2,
+    /// `offset` field of the widget's child.
+    child_offset: Vec2,
     /// The size of the widget.
     size: Vec2,
 
@@ -180,6 +188,8 @@ impl Default for WidgetData {
         Self {
             children: Vec::new(),
             origin: Vec2::ZERO,
+            offset: Vec2::ZERO,
+            child_offset: Vec2::ZERO,
             flex: None,
             size: Vec2::ZERO,
             classes: Vec::new(),
@@ -223,10 +233,16 @@ impl WidgetData {
     /// * `LayoutStrategy::Shrink` - shrinks the size of this widget to the size of its child
     /// (optionally with some padding)
     /// * `LayoutStrategy::Fill` - fill all available space.
-    pub fn lay_out_child(&mut self, strategy: LayoutStrategy, padding: f32, cx: &mut Context, max_size: Vec2) {
+    pub fn lay_out_child(
+        &mut self,
+        strategy: LayoutStrategy,
+        padding: f32,
+        cx: &mut Context,
+        max_size: Vec2,
+    ) {
         let mut child = self.children[0].borrow_mut();
         match strategy {
-            LayoutStrategy::Shrink  => {
+            LayoutStrategy::Shrink => {
                 child.layout(cx, max_size - (padding * 2.));
                 child.data_mut().set_origin(Vec2::splat(padding));
                 self.size = child.data().size() + (padding * 2.);
@@ -251,6 +267,14 @@ impl WidgetData {
         self.size
     }
 
+    pub fn offset(&self) -> Vec2 {
+        self.offset
+    }
+
+    pub fn child_offset(&self) -> Vec2 {
+        self.child_offset
+    }
+
     pub fn bounds(&self) -> Rect {
         Rect::new(Vec2::ZERO, self.size())
     }
@@ -269,6 +293,10 @@ impl WidgetData {
 
     pub fn set_size(&mut self, size: Vec2) {
         self.size = size;
+    }
+
+    pub fn set_offset(&mut self, offset: Vec2) {
+        self.offset = offset;
     }
 
     pub fn add_child(&mut self, child: WidgetPodHandle) {

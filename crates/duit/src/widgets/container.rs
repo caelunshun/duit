@@ -52,7 +52,7 @@ impl Widget for Container {
 
         canvas
             .begin_path()
-            .rounded_rect(Vec2::ZERO, data.size(), style.border_radius);
+            .rounded_rect(data.child_offset(), data.size(), style.border_radius);
 
         canvas.solid_color(style.background_color.into()).fill();
 
