@@ -8,6 +8,7 @@ pub struct Image {
     sprite: Option<SpriteId>,
     sprite_name: Option<String>,
     width: Option<f32>,
+    zoom_to_fill: bool,
 }
 
 impl Image {
@@ -16,6 +17,7 @@ impl Image {
             sprite: None,
             sprite_name: spec.image.clone(),
             width: spec.size,
+            zoom_to_fill: spec.zoom_to_fill,
         }
     }
 
@@ -56,7 +58,7 @@ impl Widget for Image {
         mut cx: Context,
         max_size: Vec2,
     ) {
-        let width = match self.width {
+        let mut width = match self.width {
             Some(w) => w,
             None => max_size.x,
         };
@@ -64,6 +66,10 @@ impl Widget for Image {
         let dimensions = cx.canvas.sprite_dimensions(sprite);
         let aspect_ratio = dimensions.x as f32 / dimensions.y as f32;
         let height = width / aspect_ratio;
+
+        if self.zoom_to_fill && max_size.x / aspect_ratio < max_size.y {
+            width += (max_size.y - max_size.x / aspect_ratio) * aspect_ratio;
+        }
 
         data.set_size(vec2(width, height));
 

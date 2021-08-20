@@ -152,6 +152,8 @@ pub struct ImageSpec {
     pub image: Option<String>,
     pub size: Option<f32>,
     pub child: Option<Box<Widget>>,
+    #[serde(default)]
+    pub zoom_to_fill: bool,
 }
 
 #[derive(Clone, Copy, Debug, Deserialize)]
