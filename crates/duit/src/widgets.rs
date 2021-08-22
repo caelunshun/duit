@@ -6,6 +6,7 @@ pub mod progress_bar;
 pub mod text;
 pub mod clickable;
 pub mod text_input;
+pub mod slider;
 
 pub use button::Button;
 pub use container::Container;
@@ -15,3 +16,4 @@ pub use progress_bar::ProgressBar;
 pub use text::Text;
 pub use clickable::Clickable;
 pub use text_input::TextInput;
+pub use slider::Slider;

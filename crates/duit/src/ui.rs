@@ -86,13 +86,14 @@ impl Ui {
 
     pub fn render(&mut self, canvas: &mut Canvas, window_logical_size: Vec2) {
         for id in &self.sorted_windows {
-            let window = &mut self.windows[*id];
-            window.render(
-                canvas,
-                &mut self.style_engine,
-                &mut self.messages,
-                window_logical_size,
-            );
+            if let Some(window) = self.windows.get_mut(*id) {
+                window.render(
+                    canvas,
+                    &mut self.style_engine,
+                    &mut self.messages,
+                    window_logical_size,
+                );
+            }
         }
     }
 
@@ -131,6 +132,21 @@ impl Ui {
         });
     }
 
+    pub fn pop_message<T: 'static>(&mut self) -> Option<T> {
+        let mut index = None;
+        for (i, msg) in self.messages.iter().enumerate() {
+            if msg.downcast_ref::<T>().is_some() {
+                index = Some(i);
+                break;
+            }
+        }
+
+        match index {
+            Some(i) => Some(*self.messages.remove(i).unwrap().downcast().unwrap()),
+            None => None,
+        }
+    }
+
     fn sort_windows(&mut self) {
         let windows = &self.windows;
         self.sorted_windows.retain(|w| windows.contains_key(*w));
@@ -154,6 +170,7 @@ fn instantiate_widget(
         spec::Widget::Container(spec) => Box::new(widgets::Container::from_spec(spec)),
         spec::Widget::ProgressBar(spec) => Box::new(widgets::ProgressBar::from_spec(spec)),
         spec::Widget::Clickable(spec) => Box::new(widgets::Clickable::from_spec(spec)),
+        spec::Widget::Slider(spec) => Box::new(widgets::Slider::from_spec(spec)),
     };
 
     let mut pod = WidgetPod::new(widget);

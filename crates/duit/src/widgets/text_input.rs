@@ -194,6 +194,8 @@ impl Widget for TextInput {
     }
 
     fn handle_event(&mut self, data: &mut WidgetData, _cx: Context, event: &Event) {
+        let focused = self.focused;
+
         match event {
             Event::MousePress {
                 pos,
@@ -216,6 +218,15 @@ impl Widget for TextInput {
                 }
             }
             _ => {}
+        }
+
+        if focused != self.focused {
+            // Update style classes
+            if self.focused {
+                data.add_class("focused");
+            } else {
+                data.remove_class("focused");
+            }
         }
     }
 }

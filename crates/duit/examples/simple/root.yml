@@ -35,4 +35,5 @@ child:
           - TextInput:
               width: 200
               placeholder: Enter text...
-              
+          - Slider:
+              width: 200

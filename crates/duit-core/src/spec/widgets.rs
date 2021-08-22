@@ -27,6 +27,7 @@ pub enum Widget {
     Container(ContainerSpec),
     ProgressBar(ProgressBarSpec),
     Clickable(ClickableSpec),
+    Slider(SliderSpec),
 }
 
 impl Widget {
@@ -53,6 +54,7 @@ impl Widget {
             Widget::Container(s) => Some(&s.base),
             Widget::ProgressBar(s) => Some(&s.base),
             Widget::Clickable(s) => Some(&s.base),
+            Widget::Slider(s) => Some(&s.base),
         }
     }
 
@@ -86,6 +88,7 @@ impl Widget {
             Widget::Container(_) => "Container",
             Widget::ProgressBar(_) => "ProgressBar",
             Widget::Clickable(_) => "Clickable",
+            Widget::Slider(_) => "Slider",
         }
     }
 }
@@ -190,4 +193,11 @@ pub struct ClickableSpec {
     #[serde(flatten)]
     pub base: BaseSpec,
     pub child: Box<Widget>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct SliderSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    pub width: Option<f32>,
 }
