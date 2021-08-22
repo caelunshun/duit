@@ -50,9 +50,14 @@ impl Widget for Container {
     fn paint(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
         let canvas = &mut cx.canvas;
 
+        let pos = match self.mode {
+            ContainerMode::FillParent | ContainerMode::FillParentAndPad(_) => Vec2::ZERO,
+            _ => data.child_offset(),
+        };
+
         canvas
             .begin_path()
-            .rounded_rect(data.child_offset(), data.size(), style.border_radius);
+            .rounded_rect(pos, data.size(), style.border_radius);
 
         canvas.solid_color(style.background_color.into()).fill();
 

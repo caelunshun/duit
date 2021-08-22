@@ -1,15 +1,13 @@
-use std::fs;
+use std::{fs, time::Instant};
 
 use duit::{Ui, WindowPositioner};
 use duit_core::spec::Spec;
-use dume_renderer::Rect;
-use framework::Example;
+use dume_renderer::{Rect, SpriteData, SpriteDescriptor};
 use glam::Vec2;
+use winit::{event_loop::EventLoop, window::WindowBuilder};
 
 use crate::generated::Simple;
 
-#[path = "../framework.rs"]
-mod framework;
 mod generated;
 
 struct Positioner;
@@ -45,14 +43,29 @@ fn main() {
 
     ui.create_window(root, Positioner, 1);
 
-    let mut time = 0.0;
-    Example::new().run(
+    let event_loop = EventLoop::new();
+    let window = WindowBuilder::new()
+        .with_title("Duit Simple Example")
+        .build(&event_loop)
+        .unwrap();
+
+    let start = Instant::now();
+
+    duit_platform::run(
+        event_loop,
+        window,
         ui,
-        |message: &Message| match message {
-            Message::ButtonPressed => println!("Clicked!"),
+        |cv| {
+            cv.create_sprite(SpriteDescriptor {
+                name: "ozymandias",
+                data: SpriteData::Encoded(include_bytes!("../../../../assets/ozymandias.jpeg")),
+            });
+            cv.load_font(
+                include_bytes!("../../../../assets/CormorantGaramond-Regular.ttf").to_vec(),
+            )
         },
-        move |_, dt| {
-            time += dt;
+        move |_| {
+            let time = start.elapsed().as_secs_f32();
             instance_handle
                 .progress_bar
                 .get_mut()

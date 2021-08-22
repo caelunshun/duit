@@ -136,6 +136,7 @@ pub struct TextInputSpec {
     #[serde(flatten)]
     pub base: BaseSpec,
     pub placeholder: Option<String>,
+    pub width: Option<f32>,
 }
 
 #[derive(Debug, Deserialize)]

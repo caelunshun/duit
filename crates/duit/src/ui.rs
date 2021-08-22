@@ -148,7 +148,7 @@ fn instantiate_widget(
         }
         spec::Widget::Row(spec) => Box::new(widgets::Flex::from_spec(&spec.flex, Axis::Horizontal)),
         spec::Widget::Text(spec) => Box::new(widgets::Text::from_spec(spec)),
-        spec::Widget::TextInput(_) => todo!(),
+        spec::Widget::TextInput(spec) => Box::new(widgets::TextInput::from_spec(spec)),
         spec::Widget::Button(spec) => Box::new(widgets::Button::from_spec(spec)),
         spec::Widget::Image(spec) => Box::new(widgets::Image::from_spec(spec)),
         spec::Widget::Container(spec) => Box::new(widgets::Container::from_spec(spec)),

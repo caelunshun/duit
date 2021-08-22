@@ -159,6 +159,12 @@ impl Widget for Flex {
             cursor += self.spacing;
         });
 
+        if cursor > 0. {
+            // Remove spacing after the last widget,
+            // since it isn't followed by another widget.
+            cursor -= self.spacing;
+        }
+
         let mut offset = Vec2::splat(f32::INFINITY);
 
         // Apply alignment - along both the main and cross axes.

@@ -19,7 +19,7 @@ pub fn run(
     // mut handle_msg: impl FnMut(Message) + 'static,
     mut update: impl FnMut(&mut Ui) + 'static,
 ) {
-    let instance = Instance::new(BackendBit::PRIMARY);
+    let instance = Instance::new(Backends::all());
 
     let surface = unsafe { instance.create_surface(&window) };
 
@@ -42,14 +42,14 @@ pub fn run(
     let device = Arc::new(device);
     let queue = Arc::new(queue);
 
-    let mut swap_chain_desc = SwapChainDescriptor {
-        usage: TextureUsage::RENDER_ATTACHMENT,
+    let mut swap_chain_desc = SurfaceConfiguration {
+        usage: TextureUsages::RENDER_ATTACHMENT,
         format: dume_renderer::TARGET_FORMAT,
         width: window.inner_size().width,
         height: window.inner_size().height,
         present_mode: PresentMode::Fifo,
     };
-    let mut swap_chain = device.create_swap_chain(&surface, &swap_chain_desc);
+    surface.configure(&device, &swap_chain_desc);
 
     let mut sample_texture = create_sample_texture(window.inner_size(), &*device);
 
@@ -70,7 +70,7 @@ pub fn run(
                 update(&mut ui);
 
                 ui.render(&mut canvas, window_logical_size);
-                let frame = swap_chain
+                let frame = surface
                     .get_current_frame()
                     .expect("failed to get next frame");
 
@@ -78,7 +78,7 @@ pub fn run(
 
                 canvas.render(
                     &sample_texture.create_view(&Default::default()),
-                    &frame.output.view,
+                    &frame.output.texture.create_view(&Default::default()),
                     &mut encoder,
                     window_logical_size,
                 );
@@ -92,7 +92,7 @@ pub fn run(
             } => {
                 swap_chain_desc.width = new_size.width;
                 swap_chain_desc.height = new_size.height;
-                swap_chain = device.create_swap_chain(&surface, &swap_chain_desc);
+                surface.configure(&device, &swap_chain_desc);
                 sample_texture = create_sample_texture(new_size, &*device);
             }
             Event::WindowEvent {
@@ -100,7 +100,12 @@ pub fn run(
                 ..
             } => *control_flow = ControlFlow::Exit,
             Event::WindowEvent { event, .. } => {
-                ui.handle_window_event(&mut canvas, &event, window.scale_factor());
+                ui.handle_window_event(
+                    &mut canvas,
+                    &event,
+                    window.scale_factor(),
+                    window_logical_size,
+                );
 
                 // ui.handle_messages(|m: &Message| handle_msg(m));
             }
@@ -121,6 +126,6 @@ fn create_sample_texture(window_size: PhysicalSize<u32>, device: &Device) -> Tex
         sample_count: dume_renderer::SAMPLE_COUNT,
         dimension: TextureDimension::D2,
         format: dume_renderer::TARGET_FORMAT,
-        usage: TextureUsage::RENDER_ATTACHMENT,
+        usage: TextureUsages::RENDER_ATTACHMENT,
     })
 }

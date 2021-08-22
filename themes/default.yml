@@ -35,6 +35,7 @@ styles:
     font: $default_font_family
     font_size: 16
     font_color: $text_color
+    placeholder_font_color: rgb(180, 180, 180)
     background_color: $background
     cursor_color: $foreground
     border_color: $emphasis
