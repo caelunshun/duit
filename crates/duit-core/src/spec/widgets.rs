@@ -137,6 +137,9 @@ pub struct TextInputSpec {
     pub base: BaseSpec,
     pub placeholder: Option<String>,
     pub width: Option<f32>,
+    pub max_len: Option<usize>,
+    #[serde(default)]
+    pub is_password: bool,
 }
 
 #[derive(Debug, Deserialize)]

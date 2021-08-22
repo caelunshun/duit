@@ -74,9 +74,10 @@ impl WidgetPod {
             messages: parent_cx.messages,
         };
         self.widget.layout(&mut self.data, cx, max_size);
-        
+
         if let Some(first_child) = self.data.children.get(0) {
-            self.data.child_offset = first_child.borrow().data().offset();
+            self.data.child_offset =
+                first_child.borrow().data().offset() + first_child.borrow().data().child_offset();
         }
     }
 
