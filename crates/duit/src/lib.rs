@@ -7,17 +7,20 @@ mod widget;
 pub mod widgets;
 mod window;
 
+use std::{cell::RefCell, rc::Rc};
+
 pub use color::Color;
 pub use event::Event;
 pub use spec::InstanceHandle;
 pub use style::StyleError;
 pub use ui::{Ui, WindowId};
+use widget::WidgetPod;
 pub use widget::{Widget, WidgetData, WidgetHandle, WidgetPodHandle, WidgetState};
 pub use window::WindowPositioner;
 
 pub use duit_core::{
     spec::{Spec, SpecError, ValidationError},
-    Align,
+    Align, Axis,
 };
 
 pub use dume_renderer::Rect;
@@ -34,4 +37,9 @@ impl RectExt for Rect {
             self.size + Vec2::splat(radius),
         )
     }
+}
+
+/// Constructs a [`WidgetPodHandle`] to the given widget.
+pub fn widget(w: impl Widget) -> WidgetPodHandle {
+    Rc::new(RefCell::new(WidgetPod::new(Box::new(w))))
 }

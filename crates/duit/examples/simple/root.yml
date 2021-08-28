@@ -8,32 +8,22 @@ child:
         align_h: Center
         spacing: 30
         children:
-          - Text:
-              text: "@size{40}{Here is some text. @color{rgb(200,30,60)}{And it's @color{rgb(30,50,200)}{red} sometimes.}}"
-          - Row:
-              spacing: 50
-              children:
-                - Text: "@size{24}{Row part #1}"
-                - Text: "@size{24}{@color{rgb(20,200,60)}{Row part #2}}"
-                - Text:
-                    text: "@size{24}{Hoverable text}"
-                    classes:
-                      - hoverable_text
           - Button:
               id: "the_button"
               child:
                 Text: "Click Me"
-          - Image:
-              image: ozymandias
-              size: 200
           - ProgressBar:
               id: progress_bar
               width: 200
               height: 10
               child:
                 Text: Progress
-          - TextInput:
-              width: 200
-              placeholder: Enter text...
-          - Slider:
-              width: 200
+          - Divider:
+              axis: Horizontal
+              padding: 50
+          - Table:
+              id: the_table
+              columns:
+                - name
+                - value
+              empty_rows: 2

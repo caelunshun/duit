@@ -7,6 +7,8 @@ pub mod text;
 pub mod clickable;
 pub mod text_input;
 pub mod slider;
+pub mod divider;
+pub mod table;
 
 pub use button::Button;
 pub use container::Container;
@@ -17,3 +19,5 @@ pub use text::Text;
 pub use clickable::Clickable;
 pub use text_input::TextInput;
 pub use slider::Slider;
+pub use divider::Divider;
+pub use table::Table;

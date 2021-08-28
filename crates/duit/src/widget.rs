@@ -57,10 +57,12 @@ pub struct WidgetPod {
 
 impl WidgetPod {
     pub(crate) fn new(widget: Box<dyn DynWidget>) -> Self {
-        Self {
+        let mut this = Self {
             widget,
             data: WidgetData::default(),
-        }
+        };
+        this.data.add_class(this.widget.base_class());
+        this
     }
 
     pub fn mount(&mut self) {

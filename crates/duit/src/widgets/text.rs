@@ -28,7 +28,18 @@ impl Text {
         }
     }
 
-    pub fn set_text(&mut self, markup: impl Into<String>, variables: AHashMap<String, String>) -> &mut Self {
+    pub fn from_markup(markup: impl Into<String>, variables: AHashMap<String, String>) -> Self {
+        Self {
+            queued_markup: Some((markup.into(), variables)),
+            paragraph: None,
+        }
+    }
+
+    pub fn set_text(
+        &mut self,
+        markup: impl Into<String>,
+        variables: AHashMap<String, String>,
+    ) -> &mut Self {
         self.queued_markup = Some((markup.into(), variables));
         self.paragraph = None;
         self

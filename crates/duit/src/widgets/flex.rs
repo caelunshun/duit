@@ -1,16 +1,9 @@
 use std::mem;
 
-use duit_core::{spec::widgets::FlexSpec, Align};
+use duit_core::{Align, Axis, spec::widgets::FlexSpec};
 use glam::Vec2;
 
 use crate::{widget::Context, Widget, WidgetData, WidgetPodHandle};
-
-/// Indicates an axis used for layout.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub enum Axis {
-    Horizontal = 0,
-    Vertical = 1,
-}
 
 enum ChildUpdate {
     Add(WidgetPodHandle),

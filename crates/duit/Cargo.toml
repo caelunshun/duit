@@ -19,6 +19,7 @@ winit = { version = "0.25", default-features = false }
 [dev-dependencies]
 duit-platform = { path = "../duit-platform" }
 pollster = "0.2"
+rand = "0.8"
 wgpu = "0.10"
 winit = { version = "0.25", default-features = false, features = [ "x11" ] }
 

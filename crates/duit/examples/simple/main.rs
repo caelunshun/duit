@@ -1,10 +1,11 @@
 use std::{fs, time::Instant};
 
-use duit::{Ui, WindowPositioner};
+use duit::{widget, widgets::Text, Ui, WindowPositioner};
 use duit_core::spec::Spec;
 use dume_renderer::{Rect, SpriteData, SpriteDescriptor};
 use glam::Vec2;
-use winit::{event_loop::EventLoop, window::WindowBuilder};
+use rand::Rng;
+use winit::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder};
 
 use crate::generated::Simple;
 
@@ -41,11 +42,27 @@ fn main() {
         .get_mut()
         .on_click(|| Message::ButtonPressed);
 
+    // Add table rows
+    {
+        let mut table = instance_handle.the_table.get_mut();
+
+        for i in 0..10 {
+            let name = Text::from_markup(format!("Player #{}", i), Default::default());
+            let value = Text::from_markup(
+                format!("{}", rand::thread_rng().gen_range(1u32..100)),
+                Default::default(),
+            );
+
+            table.add_row([("name", widget(name)), ("value", widget(value))]);
+        }
+    }
+
     ui.create_window(root, Positioner, 1);
 
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new()
         .with_title("Duit Simple Example")
+        .with_inner_size(LogicalSize::new(1920, 1080))
         .build(&event_loop)
         .unwrap();
 

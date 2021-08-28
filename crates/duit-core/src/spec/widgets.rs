@@ -4,7 +4,7 @@ use std::slice;
 
 use serde::Deserialize;
 
-use crate::Align;
+use crate::{Align, Axis};
 
 use super::{validate_ident, ValidationError};
 
@@ -28,6 +28,8 @@ pub enum Widget {
     ProgressBar(ProgressBarSpec),
     Clickable(ClickableSpec),
     Slider(SliderSpec),
+    Table(TableSpec),
+    Divider(DividerSpec),
 }
 
 impl Widget {
@@ -55,6 +57,8 @@ impl Widget {
             Widget::ProgressBar(s) => Some(&s.base),
             Widget::Clickable(s) => Some(&s.base),
             Widget::Slider(s) => Some(&s.base),
+            Widget::Table(s) => Some(&s.base),
+            Widget::Divider(s) => Some(&s.base),
         }
     }
 
@@ -89,6 +93,8 @@ impl Widget {
             Widget::ProgressBar(_) => "ProgressBar",
             Widget::Clickable(_) => "Clickable",
             Widget::Slider(_) => "Slider",
+            Widget::Table(_) => "Table",
+            Widget::Divider(_) => "Divider",
         }
     }
 }
@@ -200,4 +206,23 @@ pub struct SliderSpec {
     #[serde(flatten)]
     pub base: BaseSpec,
     pub width: Option<f32>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TableSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    pub columns: Vec<String>,
+    #[serde(default)]
+    pub empty_rows: u32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct DividerSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    #[serde(default)]
+    pub axis: Axis,
+    #[serde(default)]
+    pub padding: f32,
 }

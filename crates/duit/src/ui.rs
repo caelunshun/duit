@@ -1,7 +1,10 @@
 use std::{any::Any, cell::RefCell, collections::VecDeque, rc::Rc};
 
 use ahash::AHashMap;
-use duit_core::spec::{self, Spec};
+use duit_core::{
+    spec::{self, Spec},
+    Axis,
+};
 use dume_renderer::Canvas;
 use glam::Vec2;
 use slotmap::SlotMap;
@@ -12,7 +15,7 @@ use crate::{
     spec::InstanceHandle,
     style::{StyleEngine, StyleError},
     widget::{DynWidget, WidgetPod, WidgetPodHandle},
-    widgets::{self, flex::Axis},
+    widgets,
     window::{Window, WindowPositioner},
 };
 
@@ -171,12 +174,11 @@ fn instantiate_widget(
         spec::Widget::ProgressBar(spec) => Box::new(widgets::ProgressBar::from_spec(spec)),
         spec::Widget::Clickable(spec) => Box::new(widgets::Clickable::from_spec(spec)),
         spec::Widget::Slider(spec) => Box::new(widgets::Slider::from_spec(spec)),
+        spec::Widget::Table(spec) => Box::new(widgets::Table::from_spec(spec)),
+        spec::Widget::Divider(spec) => Box::new(widgets::Divider::from_spec(&spec)),
     };
 
     let mut pod = WidgetPod::new(widget);
-
-    let base_class = pod.widget.base_class().to_owned();
-    pod.data_mut().add_class(&base_class);
 
     if let Some(base) = spec_widget.base_spec() {
         pod.data_mut().set_flex(base.flex);

@@ -33,6 +33,7 @@ fn main() -> anyhow::Result<()> {
 
     let mut output_file = OpenOptions::new()
         .append(args.append)
+        .write(true)
         .create(true)
         .open(args.output)?;
     output_file.write_all(code.as_bytes())?;

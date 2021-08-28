@@ -87,3 +87,16 @@ styles:
     handle_color: $foreground
     handle_width: 5
     handle_height: 20
+
+  divider:
+    line_color: $foreground
+    line_width: 1
+
+  table:
+    border_width: 1
+    border_color: $foreground
+    background_color_a: rgb(120, 120, 120)
+    background_color_b: rgb(80, 80, 80)
+    min_row_height: 20
+    min_column_width: 20
+    cell_padding: 10

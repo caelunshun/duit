@@ -19,3 +19,16 @@ impl Default for Align {
         Align::Start
     }
 }
+
+/// Indicates an axis used for layout.
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Deserialize)]
+pub enum Axis {
+    Horizontal = 0,
+    Vertical = 1,
+}
+
+impl Default for Axis {
+    fn default() -> Self {
+        Axis::Vertical
+    }
+}
