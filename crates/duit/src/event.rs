@@ -21,6 +21,8 @@ pub enum Event {
     KeyRelease { key: VirtualKeyCode },
     /// Received a character from the keyboard.
     Character(char),
+    /// Scrolling along an axis.
+    Scroll { offset: Vec2 },
 }
 
 impl Event {
@@ -85,6 +87,17 @@ impl EventTracker {
                 })
             }
             WindowEvent::ReceivedCharacter(c) => Some(Event::Character(*c)),
+            WindowEvent::MouseWheel { delta, .. } => match delta {
+                winit::event::MouseScrollDelta::LineDelta(x, y) => Some(Event::Scroll {
+                    offset: vec2(x * 14., y * 14.),
+                }),
+                winit::event::MouseScrollDelta::PixelDelta(delta) => Some(Event::Scroll {
+                    offset: vec2(
+                        delta.to_logical(scale_factor).x,
+                        delta.to_logical(scale_factor).y,
+                    ),
+                }),
+            },
             _ => None,
         }
     }

@@ -100,3 +100,10 @@ styles:
     min_row_height: 20
     min_column_width: 20
     cell_padding: 10
+
+  scrollable:
+    bar_width: 5
+    bar_border_radius: 2
+    bar_color: rgb(80, 80, 80)
+    hovered_bar_color: rgb(90, 90, 90)
+    grabbed_bar_color: rgb(100, 100, 100)

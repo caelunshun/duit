@@ -1,29 +1,40 @@
 name: Simple
 child:
-  Container:
-    mode: FillParent
+  Scrollable:
+    scroll_axis: Vertical
     child:
-      Column:
-        align_v: Center
-        align_h: Center
-        spacing: 30
-        children:
-          - Button:
-              id: "the_button"
-              child:
-                Text: "Click Me"
-          - ProgressBar:
-              id: progress_bar
-              width: 200
-              height: 10
-              child:
-                Text: Progress
-          - Divider:
-              axis: Horizontal
-              padding: 50
-          - Table:
-              id: the_table
-              columns:
-                - name
-                - value
-              empty_rows: 2
+      Container:
+        mode: Shrink
+        child:
+          Column:
+            align_v: Start
+            align_h: Center
+            spacing: 30
+            children:
+              - Button:
+                  id: "the_button"
+                  child:
+                    Text: "Click Me"
+              - Image:
+                  image: ozymandias
+                  size: 200
+              - ProgressBar:
+                  id: progress_bar
+                  width: 200
+                  height: 10
+                  child:
+                    Text: Progress
+              - TextInput:
+                  width: 200
+                  placeholder: Enter text...
+              - Slider:
+                  width: 200
+              - Divider:
+                  axis: Horizontal
+                  padding: 50
+              - Table:
+                  id: the_table
+                  columns:
+                    - name
+                    - value
+                  empty_rows: 2

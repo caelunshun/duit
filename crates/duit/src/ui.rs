@@ -176,6 +176,8 @@ fn instantiate_widget(
         spec::Widget::Slider(spec) => Box::new(widgets::Slider::from_spec(spec)),
         spec::Widget::Table(spec) => Box::new(widgets::Table::from_spec(spec)),
         spec::Widget::Divider(spec) => Box::new(widgets::Divider::from_spec(&spec)),
+        spec::Widget::Scrollable(spec) => Box::new(widgets::Scrollable::from_spec(spec))
+        
     };
 
     let mut pod = WidgetPod::new(widget);

@@ -32,3 +32,12 @@ impl Default for Axis {
         Axis::Horizontal
     }
 }
+
+impl Axis {
+    pub fn cross(self) -> Axis {
+        match self {
+            Axis::Horizontal => Axis::Vertical,
+            Axis::Vertical => Axis::Horizontal
+        }
+    }
+}

@@ -46,7 +46,7 @@ fn main() {
     {
         let mut table = instance_handle.the_table.get_mut();
 
-        for i in 0..10 {
+        for i in 0..100 {
             let name = Text::from_markup(format!("Player #{}", i), Default::default());
             let value = Text::from_markup(
                 format!("{}", rand::thread_rng().gen_range(1u32..100)),

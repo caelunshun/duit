@@ -30,6 +30,7 @@ pub enum Widget {
     Slider(SliderSpec),
     Table(TableSpec),
     Divider(DividerSpec),
+    Scrollable(ScrollableSpec),
 }
 
 impl Widget {
@@ -59,6 +60,7 @@ impl Widget {
             Widget::Slider(s) => Some(&s.base),
             Widget::Table(s) => Some(&s.base),
             Widget::Divider(s) => Some(&s.base),
+            Widget::Scrollable(s) => Some(&s.base),
         }
     }
 
@@ -77,6 +79,7 @@ impl Widget {
                 None => &[],
             },
             Widget::Clickable(s) => slice::from_ref(&*s.child),
+            Widget::Scrollable(s) => slice::from_ref(&*s.child),
             _ => &[],
         }
     }
@@ -95,6 +98,7 @@ impl Widget {
             Widget::Slider(_) => "Slider",
             Widget::Table(_) => "Table",
             Widget::Divider(_) => "Divider",
+            Widget::Scrollable(_) => "Scrollable",
         }
     }
 }
@@ -225,4 +229,12 @@ pub struct DividerSpec {
     pub axis: Axis,
     #[serde(default)]
     pub padding: f32,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct ScrollableSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    pub scroll_axis: Axis,
+    pub child: Box<Widget>,
 }
