@@ -11,6 +11,8 @@ use crate::generated::Simple;
 
 mod generated;
 
+struct SelectedItem(u32);
+
 struct Positioner;
 impl WindowPositioner for Positioner {
     fn compute_position(&self, available_space: Vec2) -> Rect {
@@ -41,6 +43,14 @@ fn main() {
         .the_button
         .get_mut()
         .on_click(|| Message::ButtonPressed);
+
+    for i in 0..10 {
+        let mut pick_list = instance_handle.the_pick_list.get_mut();
+        pick_list.add_option(
+            widget(Text::from_markup(format!("#{}", i), Default::default())),
+            move || SelectedItem(i),
+        );
+    }
 
     // Add table rows
     {

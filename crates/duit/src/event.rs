@@ -22,7 +22,7 @@ pub enum Event {
     /// Received a character from the keyboard.
     Character(char),
     /// Scrolling along an axis.
-    Scroll { offset: Vec2 },
+    Scroll { offset: Vec2, mouse_pos: Vec2 },
 }
 
 impl Event {
@@ -38,6 +38,10 @@ impl Event {
                 button,
             },
             Event::MouseMove { pos } => Event::MouseMove { pos: pos + delta },
+            Event::Scroll { offset, mouse_pos } => Event::Scroll {
+                offset,
+                mouse_pos: mouse_pos + delta,
+            },
             // events that contain no coordinates (keyboard events)
             e => e,
         }
@@ -90,12 +94,14 @@ impl EventTracker {
             WindowEvent::MouseWheel { delta, .. } => match delta {
                 winit::event::MouseScrollDelta::LineDelta(x, y) => Some(Event::Scroll {
                     offset: vec2(x * 14., y * 14.),
+                    mouse_pos: self.cursor_position,
                 }),
                 winit::event::MouseScrollDelta::PixelDelta(delta) => Some(Event::Scroll {
                     offset: vec2(
                         delta.to_logical(scale_factor).x,
                         delta.to_logical(scale_factor).y,
                     ),
+                    mouse_pos: self.cursor_position,
                 }),
             },
             _ => None,

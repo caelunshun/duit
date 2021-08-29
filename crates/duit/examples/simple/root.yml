@@ -1,38 +1,46 @@
 name: Simple
 child:
-  Scrollable:
-    scroll_axis: Vertical
+  Container:
+    mode: Shrink
     child:
-      Container:
-        mode: Shrink
-        child:
-          Column:
-            align_v: Start
-            align_h: Center
-            spacing: 30
-            children:
-              - Button:
-                  id: "the_button"
-                  child:
-                    Text: "Click Me"
-              - Image:
-                  image: ozymandias
-                  size: 200
-              - ProgressBar:
-                  id: progress_bar
-                  width: 200
-                  height: 10
-                  child:
-                    Text: Progress
-              - TextInput:
-                  width: 200
-                  placeholder: Enter text...
-              - Slider:
-                  width: 200
-              - Divider:
-                  axis: Horizontal
-                  padding: 50
-              - Table:
+      Column:
+        align_v: Start
+        align_h: Center
+        spacing: 30
+        children:
+          - Button:
+              id: "the_button"
+              child:
+                Text: "Click Me"
+          - Image:
+              image: ozymandias
+              size: 200
+          - ProgressBar:
+              id: progress_bar
+              width: 200
+              height: 10
+              child:
+                Text: Progress
+          - TextInput:
+              width: 200
+              placeholder: Enter text...
+          - Slider:
+              width: 200
+          - PickList:
+              width: 300
+              max_height: 100
+              id: the_pick_list
+              child:
+                Text:
+                  id: pick_list_placeholder
+                  text: Pick something...
+          - Divider:
+              axis: Horizontal
+              padding: 50
+          - Scrollable:
+              scroll_axis: Vertical
+              child:
+                Table:
                   id: the_table
                   columns:
                     - name

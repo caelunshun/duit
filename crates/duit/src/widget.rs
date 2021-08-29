@@ -251,6 +251,10 @@ impl WidgetData {
         }
     }
 
+    pub fn child(&self, index: usize) -> RefMut<WidgetPod> {
+        self.children[index].borrow_mut()
+    }
+
     pub fn num_children(&self) -> usize {
         self.children.len()
     }

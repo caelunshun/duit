@@ -24,9 +24,13 @@ pub struct Scrollable {
 
 impl Scrollable {
     pub fn from_spec(spec: &ScrollableSpec) -> Self {
+        Self::new(spec.scroll_axis)
+    }
+
+    pub fn new(scroll_axis: Axis) -> Self {
         Self {
-            scroll_axis: spec.scroll_axis,
-            cross_axis: spec.scroll_axis.cross(),
+            scroll_axis,
+            cross_axis: scroll_axis.cross(),
             child_size: Vec2::ZERO,
 
             scroll_pos: 0.,
@@ -98,6 +102,9 @@ impl Widget for Scrollable {
 
         let mut size = max_size;
         size[self.cross_axis as usize] = cross_size;
+        if self.child_size[self.scroll_axis as usize] <= max_size[self.scroll_axis as usize] {
+            size[self.scroll_axis as usize] = self.child_size[self.scroll_axis as usize];
+        }
         data.set_size(size);
     }
 
@@ -146,7 +153,7 @@ impl Widget for Scrollable {
                 }
                 self.bar_hovered = bar.contains(*pos);
             }
-            Event::Scroll { offset } => {
+            Event::Scroll { offset, mouse_pos } if data.bounds().contains(*mouse_pos) => {
                 self.scroll_pos -= offset[self.scroll_axis as usize];
             }
             _ => {}
