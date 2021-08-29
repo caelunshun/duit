@@ -61,6 +61,17 @@ impl Table {
         self.rows.clear();
     }
 
+    pub fn add_column(&mut self, name: &str) {
+        self.columns.push(name.into());
+    }
+
+    pub fn remove_column(&mut self, name: &str) {
+        let pos = self.columns.iter().position(|c| c.as_ref() == name);
+        if let Some(pos) = pos {
+            self.columns.remove(pos);
+        }
+    }
+
     fn rows(&self) -> impl Iterator<Item = &Row> + '_ {
         self.rows
             .iter()
@@ -189,6 +200,14 @@ impl Widget for Table {
             }
 
             cursor_y += row.height.get();
+        }
+    }
+
+    fn handle_event(&mut self, _data: &mut WidgetData, mut cx: Context, event: &crate::Event) {
+        for row in self.rows() {
+            for widget in row.widgets.values() {
+                widget.borrow_mut().handle_event(&mut cx, event);
+            }
         }
     }
 }

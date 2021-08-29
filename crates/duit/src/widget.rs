@@ -47,6 +47,14 @@ where
             (*pod.widget).as_any_mut().downcast_mut().unwrap()
         })
     }
+
+    pub fn hide(&self) {
+        self.pod.borrow_mut().data_mut().set_hidden(true);
+    }
+
+    pub fn unhide(&self) {
+        self.pod.borrow_mut().data_mut().set_hidden(false);
+    }
 }
 
 /// Contains a `dyn Widget` and the `WidgetData` associated with the widget.
@@ -70,6 +78,11 @@ impl WidgetPod {
     }
 
     pub fn layout(&mut self, parent_cx: &mut Context, max_size: Vec2) {
+        if self.data.is_hidden() {
+            self.data.set_size(Vec2::ZERO);
+            return;
+        }
+
         let cx = Context {
             canvas: parent_cx.canvas,
             style_engine: parent_cx.style_engine,
@@ -84,6 +97,10 @@ impl WidgetPod {
     }
 
     pub fn paint(&mut self, parent_cx: &mut Context) {
+        if self.data.is_hidden() {
+            return;
+        }
+
         parent_cx.canvas.translate(self.data.origin());
 
         let cx = Context {
@@ -151,7 +168,7 @@ impl WidgetPod {
         &self.data
     }
 
-    pub(crate) fn data_mut(&mut self) -> &mut WidgetData {
+    pub fn data_mut(&mut self) -> &mut WidgetData {
         &mut self.data
     }
 }
@@ -183,6 +200,9 @@ pub struct WidgetData {
     /// Whether classes have changed since the class call to `Widget::style_changed`
     classes_dirty: bool,
 
+    /// Whether the widget is hidden from view and layout.
+    hidden: bool,
+
     state: WidgetState,
 }
 
@@ -198,6 +218,7 @@ impl Default for WidgetData {
             classes: Vec::new(),
             classes_dirty: false,
             state: WidgetState::default(),
+            hidden: false,
         }
     }
 }
@@ -344,6 +365,14 @@ impl WidgetData {
 
     pub fn mark_classes_clean(&mut self) {
         self.classes_dirty = false;
+    }
+
+    pub fn set_hidden(&mut self, hidden: bool) {
+        self.hidden = hidden;
+    }
+
+    pub fn is_hidden(&self) -> bool {
+        self.hidden
     }
 }
 

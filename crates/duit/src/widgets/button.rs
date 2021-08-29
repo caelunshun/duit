@@ -15,7 +15,13 @@ pub struct Button {
 
 impl Button {
     pub fn from_spec(_spec: &ButtonSpec) -> Self {
-        Self { on_click: None }
+        Self::new()
+    }
+
+    pub fn new() -> Self {
+        Self {
+            on_click: None,
+        }
     }
 
     /// Causes a message to be sent when the button is clicked.

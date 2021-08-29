@@ -29,6 +29,6 @@ pub enum Axis {
 
 impl Default for Axis {
     fn default() -> Self {
-        Axis::Vertical
+        Axis::Horizontal
     }
 }
