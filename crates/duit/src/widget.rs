@@ -97,6 +97,16 @@ impl WidgetPod {
     }
 
     pub fn paint(&mut self, parent_cx: &mut Context) {
+        self.paint_internal(parent_cx, |this, cx| this.widget.paint(&mut this.data, cx));
+    }
+
+    pub fn paint_overlay(&mut self, parent_cx: &mut Context) {
+        self.paint_internal(parent_cx, |this, cx| {
+            this.widget.paint_overlay(&mut this.data, cx)
+        });
+    }
+
+    fn paint_internal(&mut self, parent_cx: &mut Context, paint: impl FnOnce(&mut Self, Context)) {
         if self.data.is_hidden() {
             return;
         }
@@ -108,7 +118,7 @@ impl WidgetPod {
             style_engine: parent_cx.style_engine,
             messages: parent_cx.messages,
         };
-        self.widget.paint(&mut self.data, cx);
+        paint(self, cx);
 
         parent_cx.canvas.translate(-self.data().origin());
     }
@@ -248,6 +258,12 @@ impl WidgetData {
     pub fn paint_children(&mut self, cx: &mut Context) {
         self.for_each_child(|child| {
             child.paint(cx);
+        });
+    }
+
+    pub fn paint_children_overlay(&mut self, cx: &mut Context) {
+        self.for_each_child(|child| {
+            child.paint_overlay(cx);
         });
     }
 
@@ -436,6 +452,13 @@ pub trait Widget: AsAny + 'static {
     ///
     /// This method can call `paint` on each of its children.
     fn paint(&mut self, style: &Self::Style, data: &mut WidgetData, cx: Context);
+
+    /// Paints this widget on an overlay layer. Called
+    /// after all widgets in a window have been painted.
+    #[allow(unused_variables)]
+    fn paint_overlay(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
+        data.paint_children_overlay(&mut cx);
+    }
 }
 
 /// A `Widget` with type parameters erased.
@@ -451,6 +474,8 @@ pub trait DynWidget: AsAny + 'static {
     fn layout(&mut self, data: &mut WidgetData, cx: Context, max_size: Vec2);
 
     fn paint(&mut self, data: &mut WidgetData, cx: Context);
+
+    fn paint_overlay(&mut self, data: &mut WidgetData, cx: Context);
 }
 
 impl<T> DynWidget for T
@@ -491,6 +516,14 @@ where
             .get_style(data.classes())
             .expect("failed to compute widget style");
         <T as Widget>::paint(self, &*style, data, cx)
+    }
+
+    fn paint_overlay(&mut self, data: &mut WidgetData, cx: Context) {
+        let style = cx
+            .style_engine
+            .get_style(data.classes())
+            .expect("failed to compute widget style");
+        <T as Widget>::paint_overlay(self, &*style, data, cx)
     }
 }
 

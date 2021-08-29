@@ -60,6 +60,7 @@ impl Window {
 
         root.layout(&mut cx, layout.size);
         root.paint(&mut cx);
+        root.paint_overlay(&mut cx);
 
         cx.canvas.reset_transform();
     }

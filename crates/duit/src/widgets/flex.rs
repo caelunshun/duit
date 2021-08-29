@@ -1,6 +1,6 @@
 use std::mem;
 
-use duit_core::{Align, Axis, spec::widgets::FlexSpec};
+use duit_core::{spec::widgets::FlexSpec, Align, Axis};
 use glam::Vec2;
 
 use crate::{widget::Context, Widget, WidgetData, WidgetPodHandle};
@@ -105,19 +105,23 @@ impl Widget for Flex {
         // Also determine the total size along the main axis of all non-flex children.
         let mut flex_factor_sum = 0.0f32;
         let mut non_flex_size = 0.0f32;
+        let mut consumed_space = 0.0f32;
 
         data.for_each_child(|child| match child.data().flex() {
             Some(flex_factor) => flex_factor_sum += flex_factor,
             None => {
-                child.layout(&mut cx, max_size);
+                let mut child_constraints = max_size;
+                child_constraints[main_axis] -= consumed_space;
+                child.layout(&mut cx, child_constraints);
                 non_flex_size += child.data().size()[main_axis];
+                consumed_space += child.data().size()[main_axis];
             }
         });
 
         // Available space for flex widgets is the total available space
         // minus what is consumed by non-flex widgets
         // minus spacing.
-        let total_spacing = data.num_children() as f32 * self.spacing;
+        let total_spacing = (data.num_children().saturating_sub(1)) as f32 * self.spacing;
         let flex_space = max_size[main_axis] - non_flex_size - total_spacing;
 
         // Now that we can compute each widget's size, we can set their origins.
@@ -185,8 +189,12 @@ impl Widget for Flex {
 
             child.data_mut().set_origin(origin);
 
-            if origin.x < offset.x { offset.x = origin.x; }
-            if origin.y < offset.y { offset.y = origin.y; }
+            if origin.x < offset.x {
+                offset.x = origin.x;
+            }
+            if origin.y < offset.y {
+                offset.y = origin.y;
+            }
         });
 
         if offset.x.is_infinite() {
