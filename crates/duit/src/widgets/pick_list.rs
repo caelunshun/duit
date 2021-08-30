@@ -36,6 +36,10 @@ pub struct PickList {
 
 impl PickList {
     pub fn from_spec(spec: &PickListSpec) -> Self {
+        Self::new(spec.width, spec.max_height)
+    }
+
+    pub fn new(width: Option<f32>, max_height: Option<f32>) -> Self {
         let column = Flex::from_spec(
             &FlexSpec {
                 base: BaseSpec::default(),
@@ -55,8 +59,8 @@ impl PickList {
         let selection_updated = Rc::new(Cell::new(false));
 
         Self {
-            width: spec.width,
-            max_height: spec.max_height,
+            width,
+            max_height,
 
             options: WidgetHandle::new(column),
             child: Rc::clone(&child),
@@ -118,13 +122,15 @@ impl Widget for PickList {
             None => max_size.x,
         };
 
+        let padding = 10.;
         let height = {
             let mut placeholder = data.child(CHILD_INDEX_PLACEHOLDER);
-            placeholder.layout(&mut cx, max_size);
+            placeholder.layout(&mut cx, max_size - Vec2::splat(padding * 2.));
+            placeholder.data_mut().set_origin(Vec2::splat(padding));
             placeholder.data().size().y
         };
 
-        data.set_size(vec2(width, height));
+        data.set_size(vec2(width, height) + Vec2::splat(padding * 2.));
 
         if let Some(child) = self.queued_child.take() {
             data.add_child(child);
@@ -137,11 +143,12 @@ impl Widget for PickList {
         }
         overlay.layout(&mut cx, overlay_constraints);
 
-        overlay.data_mut().set_origin(vec2(0., height));
+        overlay.data_mut().set_origin(vec2(0., data.size().y));
     }
 
     fn paint(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
         cx.canvas
+            .begin_path()
             .rounded_rect(Vec2::ZERO, data.size(), style.border_radius)
             .solid_color(style.background_color.into())
             .fill();
@@ -189,7 +196,9 @@ impl Widget for PickList {
     }
 
     fn handle_event(&mut self, data: &mut WidgetData, mut cx: Context, event: &Event) {
-        data.pass_event_to_children(&mut cx, event);
+        if self.opened {
+            data.pass_event_to_children(&mut cx, event);
+        }
 
         if self.selection_updated.get() {
             self.selection_updated.set(false);

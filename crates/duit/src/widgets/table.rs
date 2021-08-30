@@ -210,4 +210,12 @@ impl Widget for Table {
             }
         }
     }
+
+    fn paint_overlay(&mut self, _style: &Self::Style, _data: &mut WidgetData, mut cx: Context) {
+        for row in self.rows() {
+            for widget in row.widgets.values() {
+                widget.borrow_mut().paint_overlay(&mut cx);
+            }
+        }
+    }
 }
