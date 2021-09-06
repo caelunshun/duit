@@ -8,7 +8,7 @@ use crate::{Align, Axis};
 
 use super::{validate_ident, ValidationError};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Default)]
 pub struct BaseSpec {
     pub id: Option<String>,
     pub flex: Option<f32>,
@@ -31,6 +31,8 @@ pub enum Widget {
     Table(TableSpec),
     Divider(DividerSpec),
     Scrollable(ScrollableSpec),
+    PickList(PickListSpec),
+    Custom(CustomSpec),
 }
 
 impl Widget {
@@ -61,6 +63,8 @@ impl Widget {
             Widget::Table(s) => Some(&s.base),
             Widget::Divider(s) => Some(&s.base),
             Widget::Scrollable(s) => Some(&s.base),
+            Widget::PickList(s) => Some(&s.base),
+            Widget::Custom(s) => Some(&s.base),
         }
     }
 
@@ -70,21 +74,26 @@ impl Widget {
             Widget::Row(s) => s.flex.children.as_slice(),
             Widget::Button(s) => slice::from_ref(&*s.child),
             Widget::Image(s) => match &s.child {
-                Some(c) => std::slice::from_ref(&**c),
+                Some(c) => slice::from_ref(&**c),
                 None => &[],
             },
-            Widget::Container(s) => slice::from_ref(&*s.child),
+            Widget::Container(s) => match &s.child {
+                Some(c) => slice::from_ref(&**c),
+                None => &[],
+            },
             Widget::ProgressBar(s) => match &s.child {
-                Some(c) => std::slice::from_ref(&**c),
+                Some(c) => slice::from_ref(&**c),
                 None => &[],
             },
             Widget::Clickable(s) => slice::from_ref(&*s.child),
             Widget::Scrollable(s) => slice::from_ref(&*s.child),
+            Widget::PickList(s) => slice::from_ref(&*s.child),
+            Widget::Custom(s) => &s.children,
             _ => &[],
         }
     }
 
-    pub fn type_name(&self) -> &'static str {
+    pub fn type_name(&self) -> &str {
         match self {
             Widget::Column(_) => "Flex",
             Widget::Row(_) => "Flex",
@@ -99,6 +108,8 @@ impl Widget {
             Widget::Table(_) => "Table",
             Widget::Divider(_) => "Divider",
             Widget::Scrollable(_) => "Scrollable",
+            Widget::PickList(_) => "PickList",
+            Widget::Custom(s) => &s.typ,
         }
     }
 }
@@ -186,7 +197,7 @@ pub struct ContainerSpec {
     #[serde(flatten)]
     pub base: BaseSpec,
     pub mode: ContainerMode,
-    pub child: Box<Widget>,
+    pub child: Option<Box<Widget>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -237,4 +248,24 @@ pub struct ScrollableSpec {
     pub base: BaseSpec,
     pub scroll_axis: Axis,
     pub child: Box<Widget>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PickListSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    pub width: Option<f32>,
+    pub max_height: Option<f32>,
+    pub child: Box<Widget>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CustomSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    #[serde(rename = "type")]
+    pub typ: String,
+    pub params: serde_yaml::Value,
+    #[serde(default)]
+    pub children: Vec<Widget>,
 }

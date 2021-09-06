@@ -107,3 +107,25 @@ styles:
     bar_color: rgb(80, 80, 80)
     hovered_bar_color: rgb(90, 90, 90)
     grabbed_bar_color: rgb(100, 100, 100)
+
+  pick_list:
+    border_radius: 1
+    border_width: 1
+    border_color: $active
+    background_color: $background
+    arrow_font_family: $default_font_family
+    arrow_size: 20
+    arrow_color: rgb(200, 200, 200)
+
+  pick_list & hovered:
+    border_color: $foreground
+
+  pick_list_option:
+    border_radius: 1
+    border_width: 0.5
+    background_color: $window
+    border_color: $background
+    padding: 10
+
+  pick_list_option & hovered:
+    background_color: $emphasis

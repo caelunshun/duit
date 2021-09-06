@@ -3,7 +3,7 @@ mod event;
 mod spec;
 mod style;
 mod ui;
-mod widget;
+pub mod widget;
 pub mod widgets;
 mod window;
 

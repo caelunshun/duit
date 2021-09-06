@@ -17,6 +17,7 @@ use crate::{
     widget::{DynWidget, WidgetPod, WidgetPodHandle},
     widgets,
     window::{Window, WindowPositioner},
+    Event, Widget,
 };
 
 slotmap::new_key_type! {
@@ -32,6 +33,8 @@ pub struct Ui {
     style_engine: StyleEngine,
     event_tracker: EventTracker,
     messages: VecDeque<Box<dyn Any>>,
+
+    custom_widget_builders: AHashMap<String, Box<dyn Fn(&serde_yaml::Value) -> Box<dyn DynWidget>>>,
 }
 
 impl Ui {
@@ -52,6 +55,18 @@ impl Ui {
         Ok(self)
     }
 
+    pub fn add_custom_widget<W: Widget>(
+        &mut self,
+        name: &str,
+        builder: impl Fn(&serde_yaml::Value) -> W + 'static,
+    ) -> &mut Self {
+        self.custom_widget_builders.insert(
+            name.to_owned(),
+            Box::new(move |params| Box::new(builder(params))),
+        );
+        self
+    }
+
     pub fn create_spec_instance<S: InstanceHandle>(&mut self) -> (S, WidgetPodHandle) {
         let spec = self
             .specs
@@ -61,7 +76,7 @@ impl Ui {
         let mut widgets_with_ids = Vec::new();
 
         // Instantiate the widget tree.
-        let root = instantiate_widget(&spec.child, &mut widgets_with_ids);
+        let root = instantiate_widget(self, &spec.child, &mut widgets_with_ids);
 
         let spec_handle = S::init(widgets_with_ids);
         (spec_handle, root)
@@ -100,6 +115,14 @@ impl Ui {
         }
     }
 
+    pub fn convert_event(
+        &mut self,
+        event: &WindowEvent,
+        window_scale_factor: f64,
+    ) -> Option<Event> {
+        self.event_tracker.handle_event(event, window_scale_factor)
+    }
+
     pub fn handle_window_event(
         &mut self,
         canvas: &mut Canvas,
@@ -107,7 +130,7 @@ impl Ui {
         window_scale_factor: f64,
         window_logical_size: Vec2,
     ) {
-        if let Some(event) = self.event_tracker.handle_event(event, window_scale_factor) {
+        if let Some(event) = self.convert_event(event, window_scale_factor) {
             for (_, window) in &mut self.windows {
                 window.handle_event(
                     canvas,
@@ -158,6 +181,7 @@ impl Ui {
 }
 
 fn instantiate_widget(
+    ui: &Ui,
     spec_widget: &spec::Widget,
     widgets_with_ids: &mut Vec<(String, WidgetPodHandle)>,
 ) -> WidgetPodHandle {
@@ -178,6 +202,12 @@ fn instantiate_widget(
         spec::Widget::Divider(spec) => Box::new(widgets::Divider::from_spec(&spec)),
         spec::Widget::Scrollable(spec) => Box::new(widgets::Scrollable::from_spec(spec)),
         spec::Widget::PickList(spec) => Box::new(widgets::PickList::from_spec(spec)),
+        spec::Widget::Custom(spec) => ui
+            .custom_widget_builders
+            .get(&spec.typ)
+            .unwrap_or_else(|| panic!("missing custom widget '{}'", spec.typ))(
+            &spec.params
+        ),
     };
 
     let mut pod = WidgetPod::new(widget);
@@ -197,7 +227,7 @@ fn instantiate_widget(
     let children = spec_widget.children();
 
     for child in children {
-        let child = instantiate_widget(child, widgets_with_ids);
+        let child = instantiate_widget(ui, child, widgets_with_ids);
         pod.data_mut().add_child(child);
     }
 
