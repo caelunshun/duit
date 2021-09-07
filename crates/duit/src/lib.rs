@@ -23,7 +23,7 @@ pub use duit_core::{
     Align, Axis,
 };
 
-pub use dume_renderer::Rect;
+pub use dume::Rect;
 pub use glam::Vec2;
 
 pub trait RectExt {

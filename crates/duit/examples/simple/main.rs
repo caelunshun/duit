@@ -2,7 +2,7 @@ use std::{fs, time::Instant};
 
 use duit::{widget, widgets::Text, Ui, WindowPositioner};
 use duit_core::spec::Spec;
-use dume_renderer::{Rect, SpriteData, SpriteDescriptor};
+use dume::{Rect, SpriteData, SpriteDescriptor};
 use glam::Vec2;
 use rand::Rng;
 use winit::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder};

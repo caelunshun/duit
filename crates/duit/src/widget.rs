@@ -6,7 +6,7 @@ use std::{
     rc::Rc,
 };
 
-use dume_renderer::{Canvas, Rect};
+use dume::{Canvas, Rect};
 use glam::Vec2;
 use serde::de::DeserializeOwned;
 

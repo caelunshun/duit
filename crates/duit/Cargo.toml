@@ -6,7 +6,7 @@ edition = "2018"
 [dependencies]
 ahash = "0.7"
 duit-core = { path = "../duit-core" }
-dume-renderer = { path = "/Users/caelum/dev/dume/renderer" }
+dume = { path = "/Users/caelum/dev/dume" }
 glam = "0.17"
 indexmap = { version = "1", features = [ "serde" ] }
 palette = "0.5"

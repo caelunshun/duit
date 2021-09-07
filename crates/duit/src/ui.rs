@@ -5,7 +5,7 @@ use duit_core::{
     spec::{self, Spec},
     Axis,
 };
-use dume_renderer::Canvas;
+use dume::Canvas;
 use glam::Vec2;
 use slotmap::SlotMap;
 use winit::event::WindowEvent;

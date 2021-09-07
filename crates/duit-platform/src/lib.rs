@@ -1,7 +1,7 @@
 use std::{iter, sync::Arc};
 
 use duit::Ui;
-use dume_renderer::Canvas;
+use dume::Canvas;
 use glam::Vec2;
 use wgpu::*;
 use winit::{
@@ -44,7 +44,7 @@ pub fn run(
 
     let mut swap_chain_desc = SurfaceConfiguration {
         usage: TextureUsages::RENDER_ATTACHMENT,
-        format: dume_renderer::TARGET_FORMAT,
+        format: dume::TARGET_FORMAT,
         width: window.inner_size().width,
         height: window.inner_size().height,
         present_mode: PresentMode::Fifo,
@@ -123,9 +123,9 @@ fn create_sample_texture(window_size: PhysicalSize<u32>, device: &Device) -> Tex
             depth_or_array_layers: 1,
         },
         mip_level_count: 1,
-        sample_count: dume_renderer::SAMPLE_COUNT,
+        sample_count: dume::SAMPLE_COUNT,
         dimension: TextureDimension::D2,
-        format: dume_renderer::TARGET_FORMAT,
+        format: dume::TARGET_FORMAT,
         usage: TextureUsages::RENDER_ATTACHMENT,
     })
 }

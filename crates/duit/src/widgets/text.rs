@@ -1,6 +1,6 @@
 use ahash::AHashMap;
 use duit_core::spec::widgets::TextSpec;
-use dume_renderer::{
+use dume::{
     font::{self, Query},
     Align, Baseline, Paragraph, TextLayout, TextStyle,
 };
@@ -45,9 +45,9 @@ impl Text {
         self
     }
 
-    fn create_text(&mut self, style: &Style) -> dume_renderer::Text {
+    fn create_text(&mut self, style: &Style) -> dume::Text {
         let (markup, variables) = self.queued_markup.as_ref().unwrap();
-        dume_renderer::markup::parse(
+        dume::markup::parse(
             &markup,
             TextStyle {
                 color: style.default_color.into(),

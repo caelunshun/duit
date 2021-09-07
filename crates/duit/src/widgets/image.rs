@@ -1,5 +1,5 @@
 use duit_core::spec::widgets::ImageSpec;
-use dume_renderer::SpriteId;
+use dume::SpriteId;
 use glam::{vec2, Vec2};
 
 use crate::{widget::Context, Widget, WidgetData};

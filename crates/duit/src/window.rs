@@ -1,6 +1,6 @@
 use std::{any::Any, collections::VecDeque};
 
-use dume_renderer::{Canvas, Rect};
+use dume::{Canvas, Rect};
 use glam::Vec2;
 
 use crate::{

@@ -4,9 +4,7 @@ use duit_core::{
     spec::widgets::{BaseSpec, FlexSpec, PickListSpec},
     Align, Axis,
 };
-use dume_renderer::{
-    font::Query, Baseline, Paragraph, Rect, Text, TextLayout, TextSection, TextStyle,
-};
+use dume::{font::Query, Baseline, Paragraph, Rect, Text, TextLayout, TextSection, TextStyle};
 use glam::{vec2, Vec2};
 use winit::event::MouseButton;
 
@@ -176,8 +174,8 @@ impl Widget for PickList {
                     max_dimensions: Vec2::splat(f32::INFINITY),
                     line_breaks: false,
                     baseline: Baseline::Middle,
-                    align_h: dume_renderer::Align::Start,
-                    align_v: dume_renderer::Align::Start,
+                    align_h: dume::Align::Start,
+                    align_v: dume::Align::Start,
                 },
             )
         });

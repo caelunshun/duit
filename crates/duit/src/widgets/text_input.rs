@@ -1,7 +1,7 @@
 use std::{iter, time::Instant};
 
 use duit_core::spec::widgets::TextInputSpec;
-use dume_renderer::{
+use dume::{
     font::Query,
     Align,
     Baseline::{self},

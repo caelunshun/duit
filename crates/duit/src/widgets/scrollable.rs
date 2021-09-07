@@ -1,5 +1,5 @@
 use duit_core::{spec::widgets::ScrollableSpec, Axis};
-use dume_renderer::Rect;
+use dume::Rect;
 use glam::{vec2, Vec2};
 use winit::event::MouseButton;
 
