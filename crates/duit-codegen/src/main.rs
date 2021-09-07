@@ -118,6 +118,15 @@ fn gather_entries(widget: &Widget, entries: &mut Vec<Entry>) {
     for child in widget.children() {
         gather_entries(child, entries);
     }
+
+    // Special case for Tooltip
+    if let Widget::Tooltip(t) = widget {
+        for child in [&t.child, &t.tooltip] {
+            if let Some(child) = child {
+                gather_entries(child, entries);
+            }
+        }
+    }
 }
 
 fn rustfmt(code: &str) -> anyhow::Result<String> {

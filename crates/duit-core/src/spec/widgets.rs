@@ -32,6 +32,7 @@ pub enum Widget {
     Divider(DividerSpec),
     Scrollable(ScrollableSpec),
     PickList(PickListSpec),
+    Tooltip(TooltipSpec),
     Custom(CustomSpec),
 }
 
@@ -43,6 +44,13 @@ impl Widget {
             }
         }
         Ok(())
+    }
+
+    pub fn init(&mut self) {
+        if let Widget::Tooltip(t) = self {
+            t.children.push(*t.child.take().unwrap());
+            t.children.push(*t.tooltip.take().unwrap());
+        }
     }
 
     pub fn base_spec(&self) -> Option<&BaseSpec> {
@@ -64,6 +72,7 @@ impl Widget {
             Widget::Divider(s) => Some(&s.base),
             Widget::Scrollable(s) => Some(&s.base),
             Widget::PickList(s) => Some(&s.base),
+            Widget::Tooltip(s) => Some(&s.base),
             Widget::Custom(s) => Some(&s.base),
         }
     }
@@ -88,6 +97,7 @@ impl Widget {
             Widget::Clickable(s) => slice::from_ref(&*s.child),
             Widget::Scrollable(s) => slice::from_ref(&*s.child),
             Widget::PickList(s) => slice::from_ref(&*s.child),
+            Widget::Tooltip(s) => &s.children,
             Widget::Custom(s) => &s.children,
             _ => &[],
         }
@@ -109,6 +119,7 @@ impl Widget {
             Widget::Divider(_) => "Divider",
             Widget::Scrollable(_) => "Scrollable",
             Widget::PickList(_) => "PickList",
+            Widget::Tooltip(_) => "Tooltip",
             Widget::Custom(s) => &s.typ,
         }
     }
@@ -257,6 +268,17 @@ pub struct PickListSpec {
     pub width: Option<f32>,
     pub max_height: Option<f32>,
     pub child: Box<Widget>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct TooltipSpec {
+    #[serde(flatten)]
+    pub base: BaseSpec,
+    pub child: Option<Box<Widget>>,
+    pub tooltip: Option<Box<Widget>>,
+
+    #[serde(default)]
+    children: Vec<Widget>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -202,6 +202,7 @@ fn instantiate_widget(
         spec::Widget::Divider(spec) => Box::new(widgets::Divider::from_spec(&spec)),
         spec::Widget::Scrollable(spec) => Box::new(widgets::Scrollable::from_spec(spec)),
         spec::Widget::PickList(spec) => Box::new(widgets::PickList::from_spec(spec)),
+        spec::Widget::Tooltip(_spec) => Box::new(widgets::Tooltip::new()),
         spec::Widget::Custom(spec) => ui
             .custom_widget_builders
             .get(&spec.typ)
@@ -229,6 +230,17 @@ fn instantiate_widget(
     for child in children {
         let child = instantiate_widget(ui, child, widgets_with_ids);
         pod.data_mut().add_child(child);
+    }
+
+    // Special case for Tooltip, because its children
+    // cannot be represented as a slice
+    if let spec::Widget::Tooltip(s) = spec_widget {
+        for child in [&s.child, &s.tooltip] {
+            if let Some(child) = child {
+                let child = instantiate_widget(ui, child, widgets_with_ids);
+                pod.data_mut().add_child(child);
+            }
+        }
     }
 
     pod.mount();
