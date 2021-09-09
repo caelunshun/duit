@@ -21,12 +21,12 @@ impl ProgressBar {
     }
 
     pub fn set_progress(&mut self, progress: f32) -> &mut Self {
-        self.progress = progress;
+        self.progress = progress.clamp(0., 1.);
         self
     }
 
     pub fn set_projected_progress(&mut self, projected_progress: f32) -> &mut Self {
-        self.projected_progress = Some(projected_progress);
+        self.projected_progress = Some(projected_progress.clamp(0., 1.));
         self
     }
 }
