@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use glam::{vec2, Vec2};
 
 use winit::event::{KeyboardInput, WindowEvent};
@@ -10,7 +12,11 @@ pub use winit::event::{ModifiersState, MouseButton, VirtualKeyCode};
 #[derive(Debug, Copy, Clone)]
 pub enum Event {
     /// A mouse click.
-    MousePress { pos: Vec2, button: MouseButton },
+    MousePress {
+        pos: Vec2,
+        button: MouseButton,
+        is_double: bool,
+    },
     /// A mouse release.
     MouseRelease { pos: Vec2, button: MouseButton },
     /// The mouse moved.
@@ -29,10 +35,16 @@ impl Event {
     /// Applies a translation to any coordinates in this event.
     pub fn translated(&self, delta: Vec2) -> Self {
         match *self {
-            Event::MousePress { pos, button } => Event::MousePress {
+            Event::MousePress {
+                pos,
+                button,
+                is_double,
+            } => Event::MousePress {
                 pos: pos + delta,
                 button,
+                is_double,
             },
+
             Event::MouseRelease { pos, button } => Event::MouseRelease {
                 pos: pos + delta,
                 button,
@@ -51,6 +63,8 @@ impl Event {
 #[derive(Default)]
 pub(crate) struct EventTracker {
     cursor_position: Vec2,
+
+    last_click_time: Option<Instant>,
 }
 
 impl EventTracker {
@@ -74,10 +88,29 @@ impl EventTracker {
                 },
             }),
             WindowEvent::MouseInput { state, button, .. } => Some(match state {
-                winit::event::ElementState::Pressed => Event::MousePress {
-                    pos: self.cursor_position,
-                    button: *button,
-                },
+                winit::event::ElementState::Pressed => {
+                    if self
+                        .last_click_time
+                        .map(|t| {
+                            t.elapsed().as_secs_f32() < 0.5 && t.elapsed().as_secs_f32() > 0.02
+                        })
+                        .unwrap_or_default()
+                    {
+                        self.last_click_time = None;
+                        Event::MousePress {
+                            pos: self.cursor_position,
+                            button: *button,
+                            is_double: true,
+                        }
+                    } else {
+                        self.last_click_time = Some(Instant::now());
+                        Event::MousePress {
+                            pos: self.cursor_position,
+                            button: *button,
+                            is_double: false,
+                        }
+                    }
+                }
                 winit::event::ElementState::Released => Event::MouseRelease {
                     pos: self.cursor_position,
                     button: *button,

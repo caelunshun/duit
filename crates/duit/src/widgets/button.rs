@@ -19,9 +19,7 @@ impl Button {
     }
 
     pub fn new() -> Self {
-        Self {
-            on_click: None,
-        }
+        Self { on_click: None }
     }
 
     /// Causes a message to be sent when the button is clicked.
@@ -59,12 +57,7 @@ impl Widget for Button {
         mut cx: Context,
         max_size: Vec2,
     ) {
-        data.lay_out_child(
-            LayoutStrategy::Shrink,
-            style.padding,
-            &mut cx,
-            max_size,
-        );
+        data.lay_out_child(LayoutStrategy::Shrink, style.padding, &mut cx, max_size);
     }
 
     fn paint(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
@@ -88,6 +81,7 @@ impl Widget for Button {
             if let Event::MousePress {
                 button: MouseButton::Left,
                 pos,
+                ..
             } = event
             {
                 if data.bounds().contains(*pos) {

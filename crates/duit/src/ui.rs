@@ -126,20 +126,17 @@ impl Ui {
     pub fn handle_window_event(
         &mut self,
         canvas: &mut Canvas,
-        event: &WindowEvent,
-        window_scale_factor: f64,
+        event: &Event,
         window_logical_size: Vec2,
     ) {
-        if let Some(event) = self.convert_event(event, window_scale_factor) {
-            for (_, window) in &mut self.windows {
-                window.handle_event(
-                    canvas,
-                    &mut self.style_engine,
-                    &mut self.messages,
-                    &event,
-                    window_logical_size,
-                );
-            }
+        for (_, window) in &mut self.windows {
+            window.handle_event(
+                canvas,
+                &mut self.style_engine,
+                &mut self.messages,
+                &event,
+                window_logical_size,
+            );
         }
     }
 

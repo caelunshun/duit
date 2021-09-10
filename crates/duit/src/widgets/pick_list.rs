@@ -205,7 +205,7 @@ impl Widget for PickList {
 
         if let Event::MousePress {
             pos,
-            button: MouseButton::Left,
+            button: MouseButton::Left, ..
         } = event
         {
             let overlay = self.child.borrow();
@@ -272,7 +272,7 @@ impl Widget for PickListOption {
     fn handle_event(&mut self, data: &mut WidgetData, mut cx: Context, event: &Event) {
         if let Event::MousePress {
             button: MouseButton::Left,
-            pos,
+            pos, ..
         } = event
         {
             if data.bounds().contains(*pos) {

@@ -100,12 +100,9 @@ pub fn run(
                 ..
             } => *control_flow = ControlFlow::Exit,
             Event::WindowEvent { event, .. } => {
-                ui.handle_window_event(
-                    &mut canvas,
-                    &event,
-                    window.scale_factor(),
-                    window_logical_size,
-                );
+                if let Some(event) = ui.convert_event(&event, window.scale_factor()) {
+                    ui.handle_window_event(&mut canvas, &event, window_logical_size);
+                }
 
                 // ui.handle_messages(|m: &Message| handle_msg(m));
             }

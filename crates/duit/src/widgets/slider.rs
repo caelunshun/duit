@@ -110,7 +110,7 @@ impl Widget for Slider {
         match event {
             Event::MousePress {
                 pos,
-                button: MouseButton::Left,
+                button: MouseButton::Left, ..
             } => {
                 if self.handle_rect.expanded(5.).contains(*pos) {
                     self.grabbed = true;

@@ -199,7 +199,7 @@ impl Widget for TextInput {
         match event {
             Event::MousePress {
                 pos,
-                button: MouseButton::Left,
+                button: MouseButton::Left, ..
             } => {
                 self.focused = data.bounds().contains(*pos);
             }

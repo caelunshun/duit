@@ -136,6 +136,7 @@ impl Widget for Scrollable {
             Event::MousePress {
                 pos,
                 button: MouseButton::Left,
+                ..
             } => {
                 self.bar_grabbed = bar.contains(*pos);
                 self.grabbed_offset =

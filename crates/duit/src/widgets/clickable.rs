@@ -55,7 +55,7 @@ impl Widget for Clickable {
         if let Some(on_click) = self.on_click.as_mut() {
             if let Event::MousePress {
                 button: MouseButton::Left,
-                pos,
+                pos, ..
             } = event
             {
                 if data.bounds().contains(*pos) {
