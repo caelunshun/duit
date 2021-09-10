@@ -42,6 +42,9 @@ impl Scrollable {
     }
 
     fn bar_rect(&self, self_size: Vec2) -> Rect {
+        if self.child_size[self.scroll_axis as usize] == 0. {
+            return Rect::new(Vec2::ZERO, Vec2::ZERO);
+        }
         let bar_length = (self_size[self.scroll_axis as usize]
             / self.child_size[self.scroll_axis as usize])
             * self_size[self.scroll_axis as usize];
