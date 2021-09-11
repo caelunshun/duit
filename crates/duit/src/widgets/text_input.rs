@@ -203,7 +203,7 @@ impl Widget for TextInput {
             } => {
                 self.focused = data.bounds().contains(*pos);
             }
-            Event::KeyPress { key } => {
+            Event::KeyPress { key, .. } => {
                 if self.focused {
                     if matches!(key, VirtualKeyCode::Back | VirtualKeyCode::Delete) {
                         self.text.pop();

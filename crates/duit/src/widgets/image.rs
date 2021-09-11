@@ -73,7 +73,7 @@ impl Widget for Image {
 
         data.set_size(vec2(width, height));
 
-        data.for_each_child(|child| child.layout(&mut cx, max_size));
+        data.for_each_child(|child| child.layout(&mut cx, vec2(width, height)));
     }
 
     fn paint(&mut self, _style: &Self::Style, data: &mut WidgetData, mut cx: Context) {

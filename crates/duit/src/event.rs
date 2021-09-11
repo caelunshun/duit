@@ -16,13 +16,17 @@ pub enum Event {
         pos: Vec2,
         button: MouseButton,
         is_double: bool,
+        mods: ModifiersState,
     },
     /// A mouse release.
     MouseRelease { pos: Vec2, button: MouseButton },
     /// The mouse moved.
     MouseMove { pos: Vec2 },
     /// A key press.
-    KeyPress { key: VirtualKeyCode },
+    KeyPress {
+        key: VirtualKeyCode,
+        mods: ModifiersState,
+    },
     /// A key release.
     KeyRelease { key: VirtualKeyCode },
     /// Received a character from the keyboard.
@@ -39,10 +43,12 @@ impl Event {
                 pos,
                 button,
                 is_double,
+                mods,
             } => Event::MousePress {
                 pos: pos + delta,
                 button,
                 is_double,
+                mods,
             },
 
             Event::MouseRelease { pos, button } => Event::MouseRelease {
@@ -75,6 +81,8 @@ pub(crate) struct EventTracker {
     cursor_position: Vec2,
 
     last_click_time: Option<Instant>,
+
+    modifiers: ModifiersState,
 }
 
 impl EventTracker {
@@ -91,6 +99,7 @@ impl EventTracker {
             } => Some(match state {
                 winit::event::ElementState::Pressed => Event::KeyPress {
                     key: *virtual_keycode,
+                    mods: self.modifiers,
                 },
 
                 winit::event::ElementState::Released => Event::KeyRelease {
@@ -111,6 +120,7 @@ impl EventTracker {
                             pos: self.cursor_position,
                             button: *button,
                             is_double: true,
+                            mods: self.modifiers,
                         }
                     } else {
                         self.last_click_time = Some(Instant::now());
@@ -118,6 +128,7 @@ impl EventTracker {
                             pos: self.cursor_position,
                             button: *button,
                             is_double: false,
+                            mods: self.modifiers,
                         }
                     }
                 }
@@ -147,6 +158,10 @@ impl EventTracker {
                     mouse_pos: self.cursor_position,
                 }),
             },
+            WindowEvent::ModifiersChanged(mods) => {
+                self.modifiers = mods.clone();
+                None
+            }
             _ => None,
         }
     }

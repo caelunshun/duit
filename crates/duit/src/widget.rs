@@ -56,6 +56,14 @@ where
     pub fn unhide(&self) {
         self.pod.borrow_mut().data_mut().set_hidden(false);
     }
+
+    pub fn add_class(&self, class: &str) {
+        self.pod.borrow_mut().data_mut().add_class(class);
+    }
+
+    pub fn remove_class(&self, class: &str) {
+        self.pod.borrow_mut().data_mut().remove_class(class);
+    }
 }
 
 /// Contains a `dyn Widget` and the `WidgetData` associated with the widget.
