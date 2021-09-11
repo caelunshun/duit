@@ -208,6 +208,12 @@ pub struct ContainerSpec {
     #[serde(flatten)]
     pub base: BaseSpec,
     pub mode: ContainerMode,
+
+    // Overide mode on each axis when set to `true`
+    #[serde(default)]
+    pub fill_width: bool,
+    #[serde(default)]
+    pub fill_height: bool,
     pub child: Option<Box<Widget>>,
 }
 

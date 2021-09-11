@@ -8,11 +8,17 @@ use crate::{
 
 pub struct Container {
     mode: ContainerMode,
+    fill_width: bool,
+    fill_height: bool,
 }
 
 impl Container {
     pub fn from_spec(spec: &ContainerSpec) -> Self {
-        Self { mode: spec.mode }
+        Self {
+            mode: spec.mode,
+            fill_width: spec.fill_width,
+            fill_height: spec.fill_height,
+        }
     }
 }
 
@@ -44,7 +50,14 @@ impl Widget for Container {
             ContainerMode::FillParentAndPad(padding) => (LayoutStrategy::Fill, padding),
             ContainerMode::Pad(padding) => (LayoutStrategy::Shrink, padding),
         };
-        data.lay_out_child(strategy, padding, &mut cx, max_size);
+        let mut size = data.lay_out_child(strategy, padding, &mut cx, max_size);
+        if self.fill_width {
+            size.x = max_size.x;
+        }
+        if self.fill_height {
+            size.y = max_size.y;
+        }
+        data.set_size(size);
     }
 
     fn paint(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {

@@ -1,7 +1,7 @@
 use ahash::AHashMap;
 use duit_core::spec::widgets::TextSpec;
 use dume::{
-    font::{self, Query},
+    font::{self, Query, Weight},
     Align, Baseline, Paragraph, TextLayout, TextStyle,
 };
 use glam::{vec2, Vec2};
@@ -55,7 +55,7 @@ impl Text {
                 font: Query {
                     family: style.default_font_family.clone(),
                     style: font::Style::Normal,
-                    weight: font::Weight::Normal,
+                    weight: style.default_weight,
                 },
             },
             |var| {
@@ -94,6 +94,8 @@ pub struct Style {
     default_color: Color,
     default_size: f32,
     default_font_family: String,
+    #[serde(default)]
+    default_weight: Weight,
 }
 
 impl Widget for Text {

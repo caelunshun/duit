@@ -283,7 +283,7 @@ impl WidgetData {
         padding: f32,
         cx: &mut Context,
         max_size: Vec2,
-    ) {
+    ) -> Vec2 {
         let mut child = self.children[0].borrow_mut();
         match strategy {
             LayoutStrategy::Shrink => {
@@ -297,6 +297,7 @@ impl WidgetData {
                 self.size = max_size;
             }
         };
+        self.size
     }
 
     pub fn pass_event_to_children(&mut self, cx: &mut Context, event: &Event) {
