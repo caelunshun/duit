@@ -3,6 +3,7 @@ use std::{
     cell::{Ref, RefCell, RefMut},
     collections::VecDeque,
     marker::PhantomData,
+    ops::BitOr,
     rc::Rc,
 };
 
@@ -144,6 +145,10 @@ impl WidgetPod {
             self.widget.style_changed(&mut self.data, cx);
             self.data.mark_classes_clean();
         }
+    }
+
+    pub fn hit_test(&self, pos: Vec2) -> HitTestResult {
+        self.widget.hit_test(&self.data, pos - self.data.origin())
     }
 
     fn update_widget_state(&mut self, event: &Event) {
@@ -304,6 +309,14 @@ impl WidgetData {
         self.for_each_child(|child| child.handle_event(cx, event));
     }
 
+    pub fn pass_hit_test_to_children(&self, pos: Vec2) -> HitTestResult {
+        let mut res = HitTestResult::Missed;
+        self.for_each_child(|child| {
+            res = res | child.hit_test(pos);
+        });
+        res
+    }
+
     pub fn origin(&self) -> Vec2 {
         self.origin
     }
@@ -418,6 +431,24 @@ impl<'a> Context<'a> {
     }
 }
 
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum HitTestResult {
+    Hit,
+    Missed,
+}
+
+impl BitOr<HitTestResult> for HitTestResult {
+    type Output = HitTestResult;
+
+    fn bitor(self, rhs: HitTestResult) -> Self::Output {
+        if self == HitTestResult::Hit || rhs == HitTestResult::Hit {
+            HitTestResult::Hit
+        } else {
+            HitTestResult::Missed
+        }
+    }
+}
+
 pub trait Widget: AsAny + 'static {
     type Style: DeserializeOwned + 'static;
 
@@ -464,6 +495,20 @@ pub trait Widget: AsAny + 'static {
     fn paint_overlay(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
         data.paint_children_overlay(&mut cx);
     }
+
+    /// Performs a "hit test" that returns whether the widget
+    /// would be hit by a click at the given position.
+    ///
+    /// Generally, only widgets that render solid images
+    /// to the canvas are hit. Layout widgets, such as Flex,
+    /// don't paint to the canvas and are only hit where their
+    /// children are hit.
+    ///
+    /// The default implementation invokes `hit_test`
+    /// on all children and returns the bitwise or.
+    fn hit_test(&self, data: &WidgetData, pos: Vec2) -> HitTestResult {
+        data.pass_hit_test_to_children(pos)
+    }
 }
 
 /// A `Widget` with type parameters erased.
@@ -481,6 +526,8 @@ pub trait DynWidget: AsAny + 'static {
     fn paint(&mut self, data: &mut WidgetData, cx: Context);
 
     fn paint_overlay(&mut self, data: &mut WidgetData, cx: Context);
+
+    fn hit_test(&self, data: &WidgetData, pos: Vec2) -> HitTestResult;
 }
 
 impl<T> DynWidget for T
@@ -529,6 +576,10 @@ where
             .get_style(data.classes())
             .expect("failed to compute widget style");
         <T as Widget>::paint_overlay(self, &*style, data, cx)
+    }
+
+    fn hit_test(&self, data: &WidgetData, pos: Vec2) -> HitTestResult {
+        <T as Widget>::hit_test(self, data, pos)
     }
 }
 

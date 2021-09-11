@@ -14,7 +14,7 @@ use crate::{
     event::EventTracker,
     spec::InstanceHandle,
     style::{StyleEngine, StyleError},
-    widget::{DynWidget, WidgetPod, WidgetPodHandle},
+    widget::{DynWidget, HitTestResult, WidgetPod, WidgetPodHandle},
     widgets,
     window::{Window, WindowPositioner},
     Event, Widget,
@@ -128,16 +128,19 @@ impl Ui {
         canvas: &mut Canvas,
         event: &Event,
         window_logical_size: Vec2,
-    ) {
+    ) -> HitTestResult {
+        let mut result = HitTestResult::Missed;
         for (_, window) in &mut self.windows {
-            window.handle_event(
-                canvas,
-                &mut self.style_engine,
-                &mut self.messages,
-                &event,
-                window_logical_size,
-            );
+            result = result
+                | window.handle_event(
+                    canvas,
+                    &mut self.style_engine,
+                    &mut self.messages,
+                    &event,
+                    window_logical_size,
+                );
         }
+        result
     }
 
     /// Invokes `callback` on all messages with a given type.

@@ -2,7 +2,7 @@ use duit_core::spec::widgets::ImageSpec;
 use dume::SpriteId;
 use glam::{vec2, Vec2};
 
-use crate::{widget::Context, Widget, WidgetData};
+use crate::{Widget, WidgetData, widget::{Context, HitTestResult}};
 
 pub struct Image {
     sprite: Option<SpriteId>,
@@ -84,4 +84,12 @@ impl Widget for Image {
         );
         data.paint_children(&mut cx);
     }
+
+    fn hit_test(&self, data: &WidgetData, pos: Vec2) -> HitTestResult {
+        if data.bounds().contains(pos) {
+            HitTestResult::Hit
+        } else {
+            HitTestResult::Missed
+        }
+    } 
 }

@@ -1,10 +1,7 @@
 use duit_core::spec::widgets::{ContainerMode, ContainerSpec};
 use glam::Vec2;
 
-use crate::{
-    widget::{Context, LayoutStrategy},
-    Color, Widget, WidgetData,
-};
+use crate::{Color, Widget, WidgetData, widget::{Context, HitTestResult, LayoutStrategy}};
 
 pub struct Container {
     mode: ContainerMode,
@@ -81,4 +78,12 @@ impl Widget for Container {
 
         data.paint_children(&mut cx);
     }
+
+    fn hit_test(&self, data: &WidgetData, pos: Vec2) -> HitTestResult {
+        if data.bounds().contains(pos) {
+            HitTestResult::Hit
+        } else {
+            HitTestResult::Missed
+        }
+    } 
 }

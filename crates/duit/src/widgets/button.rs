@@ -4,10 +4,7 @@ use duit_core::spec::widgets::ButtonSpec;
 use glam::Vec2;
 use winit::event::MouseButton;
 
-use crate::{
-    widget::{Context, LayoutStrategy},
-    Color, Event, Widget, WidgetData,
-};
+use crate::{Color, Event, Widget, WidgetData, widget::{Context, HitTestResult, LayoutStrategy}};
 
 pub struct Button {
     on_click: Option<Box<dyn FnMut() -> Box<dyn Any>>>,
@@ -90,4 +87,12 @@ impl Widget for Button {
             }
         }
     }
+
+    fn hit_test(&self, data: &WidgetData, pos: Vec2) -> HitTestResult {
+        if data.bounds().contains(pos) {
+            HitTestResult::Hit
+        } else {
+            HitTestResult::Missed
+        }
+    } 
 }

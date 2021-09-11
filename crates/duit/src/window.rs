@@ -5,7 +5,7 @@ use glam::Vec2;
 
 use crate::{
     style::StyleEngine,
-    widget::{Context, WidgetPodHandle},
+    widget::{Context, HitTestResult, WidgetPodHandle},
     Event,
 };
 
@@ -72,7 +72,7 @@ impl Window {
         messages: &mut VecDeque<Box<dyn Any>>,
         event: &Event,
         available_space: Vec2,
-    ) {
+    ) -> HitTestResult {
         let mut root = self.root.borrow_mut();
         let mut cx = Context {
             canvas,
@@ -83,6 +83,11 @@ impl Window {
         let event = event.translated(-self.positioner.compute_position(available_space).pos);
 
         root.handle_event(&mut cx, &event);
+
+        match event.pos() {
+            Some(pos) => root.hit_test(pos),
+            None => HitTestResult::Missed,
+        }
     }
 
     pub fn hide(&mut self) {

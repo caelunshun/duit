@@ -58,6 +58,16 @@ impl Event {
             e => e,
         }
     }
+
+    pub fn pos(&self) -> Option<Vec2> {
+        match self {
+            Event::MousePress { pos, .. }
+            | Event::MouseRelease { pos, .. }
+            | Event::MouseMove { pos, .. }
+            | Event::Scroll { mouse_pos: pos, .. } => Some(*pos),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Default)]
