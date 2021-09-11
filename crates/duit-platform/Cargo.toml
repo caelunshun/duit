@@ -5,7 +5,7 @@ edition = "2018"
 
 [dependencies]
 duit = { path = "../duit" }
-dume = { path = "/Users/caelum/dev/dume" }
+dume = { git = "https://github.com/caelunshun/dume" }
 glam = "0.17"
 pollster = "0.2"
 wgpu = "0.10"
