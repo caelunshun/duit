@@ -26,6 +26,7 @@ pub fn run(
     let adapter = pollster::block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
         power_preference: wgpu::PowerPreference::HighPerformance,
         compatible_surface: Some(&surface),
+        force_fallback_adapter: false,
     }))
     .expect("failed to find a suitable adapter");
 
@@ -53,10 +54,16 @@ pub fn run(
 
     let mut sample_texture = create_sample_texture(window.inner_size(), &*device);
 
-    let mut canvas = Canvas::new(Arc::clone(&device), Arc::clone(&queue));
-    init_canvas(&mut canvas);
+    let context = dume::Context::builder(Arc::clone(&device), Arc::clone(&queue)).build();
 
-    canvas.set_scale_factor(window.scale_factor());
+    let mut canvas = context.create_canvas(
+        Vec2::new(
+            window.inner_size().to_logical(window.scale_factor()).width,
+            window.inner_size().to_logical(window.scale_factor()).height,
+        ),
+        window.scale_factor() as f32,
+    );
+    init_canvas(&mut canvas);
 
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
@@ -71,16 +78,15 @@ pub fn run(
 
                 ui.render(&mut canvas, window_logical_size);
                 let frame = surface
-                    .get_current_frame()
+                    .get_current_texture()
                     .expect("failed to get next frame");
 
                 let mut encoder = device.create_command_encoder(&Default::default());
 
                 canvas.render(
-                    &sample_texture.create_view(&Default::default()),
-                    &frame.output.texture.create_view(&Default::default()),
                     &mut encoder,
-                    window_logical_size,
+                    &frame.texture.create_view(&Default::default()),
+                    &sample_texture.create_view(&Default::default()),
                 );
 
                 queue.submit(iter::once(encoder.finish()));

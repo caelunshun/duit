@@ -87,7 +87,7 @@ impl Widget for Slider {
             .move_to(vec2(0.0, data.size().y / 2.))
             .line_to(vec2(data.size().x, data.size().y / 2.))
             .stroke_width(style.line_width)
-            .solid_color(style.line_color.into())
+            .solid_color(style.line_color)
             .stroke();
 
         // Handle
@@ -97,11 +97,11 @@ impl Widget for Slider {
 
         cv.begin_path()
             .rounded_rect(handle_pos, handle_size, style.handle_border_radius)
-            .solid_color(style.handle_color.into())
+            .solid_color(style.handle_color)
             .fill();
 
         cv.stroke_width(style.handle_border_width)
-            .solid_color(style.handle_border_color.into())
+            .solid_color(style.handle_border_color)
             .stroke();
     }
 

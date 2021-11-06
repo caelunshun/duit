@@ -112,9 +112,9 @@ impl Widget for Scrollable {
     }
 
     fn paint(&mut self, style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
-        cx.canvas.scissor_rect(Rect::new(Vec2::ZERO, data.size()));
+        // cx.canvas.scissor_rect(Rect::new(Vec2::ZERO, data.size()));
         data.paint_children(&mut cx);
-        cx.canvas.clear_scissor();
+        //   cx.canvas.clear_scissor();
 
         if self.child_size[self.scroll_axis as usize] > data.size()[self.scroll_axis as usize] {
             let bar = self.bar_rect(data.size());
@@ -129,7 +129,7 @@ impl Widget for Scrollable {
             } else {
                 style.bar_color
             };
-            cx.canvas.solid_color(bar_color.into()).fill();
+            cx.canvas.solid_color(bar_color).fill();
         }
     }
 

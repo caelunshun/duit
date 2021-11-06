@@ -187,11 +187,11 @@ impl Widget for Table {
                 cx.canvas
                     .begin_path()
                     .rect(pos, size)
-                    .solid_color(color.into())
+                    .solid_color(color)
                     .fill();
                 cx.canvas
                     .stroke_width(style.border_width)
-                    .solid_color(style.border_color.into())
+                    .solid_color(style.border_color)
                     .stroke();
             }
 

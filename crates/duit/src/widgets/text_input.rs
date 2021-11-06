@@ -1,11 +1,9 @@
-use std::{iter, time::Instant};
+use std::time::Instant;
 
 use duit_core::spec::widgets::TextInputSpec;
 use dume::{
-    font::Query,
-    Align,
-    Baseline::{self},
-    Canvas, Paragraph, Text, TextLayout, TextSection, TextStyle,
+    font::Query, Align, Baseline, Canvas, SmartString, Text, TextBlob, TextOptions, TextSection,
+    TextStyle,
 };
 use glam::{vec2, Vec2};
 use winit::event::{MouseButton, VirtualKeyCode};
@@ -18,10 +16,10 @@ pub struct TextInput {
     max_len: Option<usize>,
     is_password: bool,
 
-    placeholder_paragraph: Option<Paragraph>,
+    placeholder_paragraph: Option<TextBlob>,
 
     text: String,
-    text_paragraph: Option<Paragraph>,
+    text_paragraph: Option<TextBlob>,
 
     focused: bool,
 
@@ -54,7 +52,7 @@ impl TextInput {
         &self.text
     }
 
-    fn paragraph_to_draw(&self) -> &Paragraph {
+    fn paragraph_to_draw(&self) -> &TextBlob {
         if self.text.is_empty() {
             self.placeholder_paragraph
                 .as_ref()
@@ -73,7 +71,7 @@ impl TextInput {
 }
 
 fn make_password_text(text: &str) -> String {
-    iter::repeat("•").take(text.chars().count()).collect()
+    "•".repeat(text.chars().count())
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -91,24 +89,23 @@ pub struct Style {
     padding: f32,
 }
 
-fn create_paragraph(cv: &mut Canvas, style: &Style, color: Color, text: String) -> Paragraph {
-    let text = Text::from_sections(vec![TextSection::Text {
+fn create_paragraph(cv: &mut Canvas, style: &Style, color: Color, text: SmartString) -> TextBlob {
+    let text = Text::from_sections([TextSection::Text {
         text,
         style: TextStyle {
-            color: color.into(),
-            size: style.font_size,
+            color: Some(color.into()),
+            size: Some(style.font_size),
             font: Query {
-                family: style.font.clone(),
+                family: Some(style.font.clone().into()),
                 ..Default::default()
             },
         },
     }]);
 
-    cv.create_paragraph(
+    cv.context().create_text_blob(
         text,
-        TextLayout {
-            max_dimensions: Vec2::splat(f32::INFINITY),
-            line_breaks: false,
+        TextOptions {
+            wrap_lines: true,
             baseline: Baseline::Top,
             align_h: Align::Start,
             align_v: Align::Start,
@@ -129,7 +126,7 @@ impl Widget for TextInput {
                 cx.canvas,
                 style,
                 style.placeholder_font_color,
-                self.placeholder.clone(),
+                self.placeholder.clone().into(),
             ));
         }
 
@@ -140,7 +137,12 @@ impl Widget for TextInput {
                 make_password_text(&self.text)
             };
 
-            self.text_paragraph = Some(create_paragraph(cx.canvas, style, style.font_color, text));
+            self.text_paragraph = Some(create_paragraph(
+                cx.canvas,
+                style,
+                style.font_color,
+                text.into(),
+            ));
         }
 
         let width = match self.width {
@@ -158,37 +160,29 @@ impl Widget for TextInput {
 
         cv.begin_path()
             .rounded_rect(Vec2::ZERO, data.size(), style.border_radius)
-            .solid_color(style.background_color.into())
+            .solid_color(style.background_color)
             .fill();
 
-        cv.solid_color(style.border_color.into())
+        cv.solid_color(style.border_color)
             .stroke_width(style.border_width)
             .stroke();
 
         let text_pos = Vec2::new(style.padding, style.padding / 2.);
 
-        cv.draw_paragraph(text_pos, self.paragraph_to_draw());
+        cv.draw_text(self.paragraph_to_draw(), text_pos, 1.);
 
         // Cursor
         let time = self.create_time.elapsed().as_secs_f32();
         if self.focused
             && (self.last_change.elapsed().as_secs_f32() <= 0.75 || (time * 2.0) as u32 % 2 == 0)
         {
-            let cursor_pos = text_pos
-                + self
-                    .text_paragraph
-                    .as_ref()
-                    .unwrap()
-                    .lines()
-                    .last()
-                    .expect("no last line")
-                    .end;
+            let cursor_pos = text_pos + self.text_paragraph.as_ref().unwrap().size().x;
 
             cv.begin_path()
                 .move_to(cursor_pos)
                 .line_to(cursor_pos + vec2(0., style.font_size))
                 .stroke_width(style.cursor_width)
-                .solid_color(style.cursor_color.into())
+                .solid_color(style.cursor_color)
                 .stroke();
         }
     }
@@ -199,16 +193,15 @@ impl Widget for TextInput {
         match event {
             Event::MousePress {
                 pos,
-                button: MouseButton::Left, ..
+                button: MouseButton::Left,
+                ..
             } => {
                 self.focused = data.bounds().contains(*pos);
             }
             Event::KeyPress { key, .. } => {
-                if self.focused {
-                    if matches!(key, VirtualKeyCode::Back | VirtualKeyCode::Delete) {
-                        self.text.pop();
-                        self.mark_text_dirty();
-                    }
+                if self.focused && matches!(key, VirtualKeyCode::Back | VirtualKeyCode::Delete) {
+                    self.text.pop();
+                    self.mark_text_dirty();
                 }
             }
             Event::Character(c) if self.focused && !c.is_control() => {

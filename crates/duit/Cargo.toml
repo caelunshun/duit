@@ -6,10 +6,10 @@ edition = "2018"
 [dependencies]
 ahash = "0.7"
 duit-core = { path = "../duit-core" }
-dume = { git = "https://github.com/caelunshun/dume" }
+dume = { path = "../../../dume/crates/dume" }
 glam = "0.17"
 indexmap = { version = "1", features = [ "serde" ] }
-palette = "0.5"
+palette = "0.6"
 serde = { version = "1", features = [ "derive" ] }
 serde_yaml = "0.8"
 slotmap = "1"
@@ -18,9 +18,11 @@ winit = { version = "0.25", default-features = false }
 
 [dev-dependencies]
 duit-platform = { path = "../duit-platform" }
+log = "0.4"
 pollster = "0.2"
 rand = "0.8"
-wgpu = "0.10"
+simple_logger = "1"
+wgpu = "0.11"
 winit = { version = "0.25", default-features = false, features = [ "x11" ] }
 
 [[example]]

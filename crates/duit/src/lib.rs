@@ -26,6 +26,8 @@ pub use duit_core::{
 pub use dume::Rect;
 pub use glam::Vec2;
 
+pub use dume::text;
+
 pub trait RectExt {
     fn expanded(self, radius: f32) -> Self;
 }

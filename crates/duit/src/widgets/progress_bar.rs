@@ -76,7 +76,7 @@ impl Widget for ProgressBar {
         canvas
             .begin_path()
             .rounded_rect(Vec2::ZERO, data.size(), style.border_radius)
-            .solid_color(style.background_color.into())
+            .solid_color(style.background_color)
             .fill();
 
         // Progress
@@ -84,7 +84,7 @@ impl Widget for ProgressBar {
         canvas
             .begin_path()
             .rounded_rect(Vec2::ZERO, progress_size, style.border_radius)
-            .solid_color(style.progress_color.into())
+            .solid_color(style.progress_color)
             .fill();
 
         // Projected progress
@@ -96,7 +96,7 @@ impl Widget for ProgressBar {
                     data.size() * vec2(projected_progress - self.progress, 1.0),
                     style.border_radius,
                 )
-                .solid_color(style.projected_progress_color.into())
+                .solid_color(style.projected_progress_color)
                 .fill();
         }
 
@@ -104,7 +104,7 @@ impl Widget for ProgressBar {
         canvas
             .begin_path()
             .rounded_rect(Vec2::ZERO, data.size(), style.border_radius)
-            .solid_color(style.border_color.into())
+            .solid_color(style.border_color)
             .stroke_width(style.border_width)
             .stroke();
 

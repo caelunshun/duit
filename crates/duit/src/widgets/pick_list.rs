@@ -4,13 +4,13 @@ use duit_core::{
     spec::widgets::{BaseSpec, FlexSpec, PickListSpec},
     Align, Axis,
 };
-use dume::{font::Query, Baseline, Paragraph, Rect, Text, TextLayout, TextSection, TextStyle};
+use dume::{font::Query, Rect, Text, TextBlob, TextOptions, TextSection, TextStyle};
 use glam::{vec2, Vec2};
 use winit::event::MouseButton;
 
 use crate::{
-    widget::Context, widget::HitTestResult, Color, Event, Widget, WidgetData, WidgetHandle,
-    WidgetPodHandle, widget
+    widget, widget::Context, widget::HitTestResult, Color, Event, Widget, WidgetData, WidgetHandle,
+    WidgetPodHandle,
 };
 
 use super::{Flex, Scrollable};
@@ -26,7 +26,7 @@ pub struct PickList {
     queued_child: Option<WidgetPodHandle>,
     child: WidgetPodHandle,
 
-    arrow_down: Option<Paragraph>,
+    arrow_down: Option<TextBlob>,
 
     opened: bool,
 
@@ -149,40 +149,40 @@ impl Widget for PickList {
         cx.canvas
             .begin_path()
             .rounded_rect(Vec2::ZERO, data.size(), style.border_radius)
-            .solid_color(style.background_color.into())
+            .solid_color(style.background_color)
             .fill();
         cx.canvas
             .stroke_width(style.border_width)
-            .solid_color(style.border_color.into())
+            .solid_color(style.border_color)
             .stroke();
 
         let arrow_down = self.arrow_down.get_or_insert_with(|| {
             let text = Text::from_sections(vec![TextSection::Text {
-                text: ARROW_DOWN.to_owned(),
+                text: ARROW_DOWN.into(),
                 style: TextStyle {
                     font: Query {
-                        family: style.arrow_font_family.clone(),
+                        family: Some(style.arrow_font_family.clone().into()),
                         ..Default::default()
                     },
-                    size: style.arrow_size,
-                    color: style.arrow_color.into(),
-                    ..Default::default()
+                    size: Some(style.arrow_size),
+                    color: Some(style.arrow_color.into()),
+   
                 },
             }]);
-            cx.canvas.create_paragraph(
+            cx.canvas.context().create_text_blob(
                 text,
-                TextLayout {
-                    max_dimensions: Vec2::splat(f32::INFINITY),
-                    line_breaks: false,
-                    baseline: Baseline::Middle,
+                TextOptions {
+                    baseline: dume::Baseline::Middle,
                     align_h: dume::Align::Start,
                     align_v: dume::Align::Start,
+                    wrap_lines: false,
                 },
             )
         });
-        cx.canvas.draw_paragraph(
-            data.size() - vec2(style.arrow_size, data.size().y / 2.),
+        cx.canvas.draw_text(
             arrow_down,
+            data.size() - vec2(style.arrow_size, data.size().y / 2.),
+            1.,
         );
 
         data.child(CHILD_INDEX_PLACEHOLDER).paint(&mut cx);
@@ -261,10 +261,10 @@ impl Widget for PickListOption {
         cx.canvas
             .begin_path()
             .rect(Vec2::ZERO, data.size())
-            .solid_color(style.background_color.into())
+            .solid_color(style.background_color)
             .fill();
         cx.canvas
-            .solid_color(style.border_color.into())
+            .solid_color(style.border_color)
             .stroke_width(style.border_width)
             .stroke();
 

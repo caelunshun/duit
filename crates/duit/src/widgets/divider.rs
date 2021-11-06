@@ -53,7 +53,7 @@ impl Widget for Divider {
             .begin_path()
             .move_to(Vec2::ZERO)
             .line_to(endpoint)
-            .solid_color(style.line_color.into())
+            .solid_color(style.line_color)
             .stroke_width(style.line_width)
             .stroke();
     }

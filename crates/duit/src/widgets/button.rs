@@ -63,10 +63,10 @@ impl Widget for Button {
         canvas
             .begin_path()
             .rounded_rect(Vec2::ZERO, data.size(), style.border_radius)
-            .solid_color(style.background_color.into())
+            .solid_color(style.background_color)
             .fill();
         canvas
-            .solid_color(style.border_color.into())
+            .solid_color(style.border_color)
             .stroke_width(style.border_width)
             .stroke();
 

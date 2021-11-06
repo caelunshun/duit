@@ -1,12 +1,15 @@
 use duit_core::spec::widgets::ImageSpec;
-use dume::SpriteId;
+use dume::TextureId;
 use glam::{vec2, Vec2};
 
-use crate::{Widget, WidgetData, widget::{Context, HitTestResult}};
+use crate::{
+    widget::{Context, HitTestResult},
+    Widget, WidgetData,
+};
 
 pub struct Image {
-    sprite: Option<SpriteId>,
-    sprite_name: Option<String>,
+    texture: Option<TextureId>,
+    texture_name: Option<String>,
     width: Option<f32>,
     zoom_to_fill: bool,
 }
@@ -14,31 +17,30 @@ pub struct Image {
 impl Image {
     pub fn from_spec(spec: &ImageSpec) -> Self {
         Self {
-            sprite: None,
-            sprite_name: spec.image.clone(),
+            texture: None,
+            texture_name: spec.image.clone(),
             width: spec.size,
             zoom_to_fill: spec.zoom_to_fill,
         }
     }
 
     pub fn set_image(&mut self, sprite_name: impl Into<String>) -> &mut Self {
-        self.sprite_name = Some(sprite_name.into());
-        self.sprite = None;
+        self.texture_name = Some(sprite_name.into());
+        self.texture = None;
         self
     }
 
-    fn update_sprite(&mut self, cx: &mut Context) -> SpriteId {
-        match self.sprite {
+    fn update_texture(&mut self, cx: &mut Context) -> TextureId {
+        match self.texture {
             Some(s) => s,
             None => {
-                self.sprite = Some(
+                self.texture = Some(
                     cx.canvas
-                        .sprite_by_name(self.sprite_name.as_ref().unwrap())
-                        .unwrap_or_else(|| {
-                            panic!("missing sprite '{}'", self.sprite_name.as_ref().unwrap())
-                        }),
+                        .context()
+                        .texture_for_name(self.texture_name.as_ref().unwrap())
+                        .expect("missing texture"),
                 );
-                self.sprite.unwrap()
+                self.texture.unwrap()
             }
         }
     }
@@ -62,8 +64,8 @@ impl Widget for Image {
             Some(w) => w,
             None => max_size.x,
         };
-        let sprite = self.update_sprite(&mut cx);
-        let dimensions = cx.canvas.sprite_dimensions(sprite);
+        let texture = self.update_texture(&mut cx);
+        let dimensions = cx.canvas.context().texture_dimensions(texture);
         let aspect_ratio = dimensions.x as f32 / dimensions.y as f32;
         let height = width / aspect_ratio;
 
@@ -78,7 +80,7 @@ impl Widget for Image {
 
     fn paint(&mut self, _style: &Self::Style, data: &mut WidgetData, mut cx: Context) {
         cx.canvas.draw_sprite(
-            self.sprite.expect("sprite ID not set by layout()"),
+            self.texture.expect("sprite ID not set by layout()"),
             Vec2::ZERO,
             data.size().x,
         );
@@ -91,5 +93,5 @@ impl Widget for Image {
         } else {
             HitTestResult::Missed
         }
-    } 
+    }
 }

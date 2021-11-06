@@ -2,7 +2,7 @@ use std::{fs, time::Instant};
 
 use duit::{widget, widgets::Text, Ui, WindowPositioner};
 use duit_core::spec::Spec;
-use dume::{Rect, SpriteData, SpriteDescriptor};
+use dume::Rect;
 use glam::Vec2;
 use rand::Rng;
 use winit::{dpi::LogicalSize, event_loop::EventLoop, window::WindowBuilder};
@@ -28,6 +28,8 @@ enum Message {
 }
 
 fn main() {
+    simple_logger::SimpleLogger::new().with_level(log::LevelFilter::Error).init().unwrap();
+
     let mut ui = Ui::new();
 
     ui.add_spec(
@@ -46,10 +48,9 @@ fn main() {
 
     for i in 0..10 {
         let mut pick_list = instance_handle.the_pick_list.get_mut();
-        pick_list.add_option(
-            widget(Text::from_markup(format!("#{}", i), Default::default())),
-            move || SelectedItem(i),
-        );
+        pick_list.add_option(widget(Text::new(duit::text!("#{}", i))), move || {
+            SelectedItem(i)
+        });
     }
 
     // Add table rows
@@ -57,11 +58,8 @@ fn main() {
         let mut table = instance_handle.the_table.get_mut();
 
         for i in 0..100 {
-            let name = Text::from_markup(format!("Player #{}", i), Default::default());
-            let value = Text::from_markup(
-                format!("{}", rand::thread_rng().gen_range(1u32..100)),
-                Default::default(),
-            );
+            let name = Text::new(dume::text!("Player #{}", i));
+            let value = Text::new(dume::text!("{}", rand::thread_rng().gen_range(1u32..100)));
 
             table.add_row([("name", widget(name)), ("value", widget(value))]);
         }
@@ -83,13 +81,20 @@ fn main() {
         window,
         ui,
         |cv| {
-            cv.create_sprite(SpriteDescriptor {
-                name: "ozymandias",
-                data: SpriteData::Encoded(include_bytes!("../../../../assets/ozymandias.jpeg")),
-            });
-            cv.load_font(
-                include_bytes!("../../../../assets/CormorantGaramond-Regular.ttf").to_vec(),
-            )
+            let mut texture_set = cv.context().create_texture_set_builder();
+            texture_set
+                .add_texture(
+                    include_bytes!("../../../../assets/ozymandias.jpeg"),
+                    "ozymandias",
+                )
+                .unwrap();
+            cv.context()
+                .add_texture_set(texture_set.build(1024, 4096).unwrap());
+            cv.context()
+                .add_font(
+                    include_bytes!("../../../../assets/CormorantGaramond-Regular.ttf").to_vec(),
+                )
+                .unwrap();
         },
         move |_| {
             let time = start.elapsed().as_secs_f32();

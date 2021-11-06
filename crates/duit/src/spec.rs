@@ -5,3 +5,4 @@ pub trait InstanceHandle {
 
     fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self;
 }
+ 
