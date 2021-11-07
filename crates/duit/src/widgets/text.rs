@@ -8,7 +8,7 @@ use crate::{
 };
 
 pub struct Text {
-    text: Option<dume::Text>,
+    text: dume::Text,
     paragraph: Option<TextBlob>,
 }
 
@@ -19,23 +19,23 @@ impl Text {
             TextSpec::Complex { text, .. } => text.as_ref().map(String::as_str).unwrap_or_default(),
         };
         Self {
-            text: Some(dume::Text::from_sections([TextSection::Text {
+            text: dume::Text::from_sections([TextSection::Text {
                 text: initial_text.into(),
                 style: Default::default(),
-            }])),
+            }]),
             paragraph: None,
         }
     }
 
     pub fn new(text: dume::Text) -> Self {
         Self {
-            text: Some(text),
+            text,
             paragraph: None,
         }
     }
 
     pub fn set_text(&mut self, text: dume::Text) -> &mut Self {
-        self.text = Some(text);
+        self.text = text;
         self.paragraph = None;
         self
     }
@@ -46,7 +46,7 @@ impl Text {
         cx: &mut Context,
         max_size: Vec2,
     ) -> &mut TextBlob {
-        let mut dume_text = self.text.take().expect("no text stored");
+        let dume_text = &mut self.text;
         dume_text.set_default_size(style.default_size);
         dume_text.set_default_color(style.default_color.into());
         dume_text.set_default_font_family(style.default_font_family.clone().into());

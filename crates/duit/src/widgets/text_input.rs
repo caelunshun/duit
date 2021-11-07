@@ -176,7 +176,7 @@ impl Widget for TextInput {
         if self.focused
             && (self.last_change.elapsed().as_secs_f32() <= 0.75 || (time * 2.0) as u32 % 2 == 0)
         {
-            let cursor_pos = text_pos + self.text_paragraph.as_ref().unwrap().size().x;
+            let cursor_pos = text_pos + vec2(self.text_paragraph.as_ref().unwrap().size().x, 0.);
 
             cv.begin_path()
                 .move_to(cursor_pos)

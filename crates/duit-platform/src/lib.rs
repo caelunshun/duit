@@ -1,4 +1,4 @@
-use std::{iter, sync::Arc};
+use std::sync::Arc;
 
 use duit::Ui;
 use dume::Canvas;
@@ -81,15 +81,12 @@ pub fn run(
                     .get_current_texture()
                     .expect("failed to get next frame");
 
-                let mut encoder = device.create_command_encoder(&Default::default());
-
                 canvas.render(
-                    &mut encoder,
                     &frame.texture.create_view(&Default::default()),
                     &sample_texture.create_view(&Default::default()),
                 );
 
-                queue.submit(iter::once(encoder.finish()));
+                frame.present();
             }
             Event::MainEventsCleared => window.request_redraw(),
             Event::WindowEvent {
@@ -100,6 +97,13 @@ pub fn run(
                 swap_chain_desc.height = new_size.height;
                 surface.configure(&device, &swap_chain_desc);
                 sample_texture = create_sample_texture(new_size, &*device);
+                canvas.resize(
+                    Vec2::new(
+                        new_size.to_logical(window.scale_factor()).width,
+                        new_size.to_logical(window.scale_factor()).height,
+                    ),
+                    window.scale_factor() as f32,
+                );
             }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,

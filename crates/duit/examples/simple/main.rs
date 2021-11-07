@@ -28,8 +28,6 @@ enum Message {
 }
 
 fn main() {
-    simple_logger::SimpleLogger::new().with_level(log::LevelFilter::Error).init().unwrap();
-
     let mut ui = Ui::new();
 
     ui.add_spec(
