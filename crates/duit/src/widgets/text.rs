@@ -5,18 +5,30 @@ use glam::Vec2;
 use crate::{
     color::Color,
     widget::{Context, Widget, WidgetData},
+    AlignExt,
 };
 
 pub struct Text {
     text: dume::Text,
+    align_h: Align,
+    align_v: Align,
     paragraph: Option<TextBlob>,
 }
 
 impl Text {
     pub fn from_spec(spec: &TextSpec) -> Self {
-        let initial_text = match spec {
-            TextSpec::Simple(text) => text.as_str(),
-            TextSpec::Complex { text, .. } => text.as_ref().map(String::as_str).unwrap_or_default(),
+        let (initial_text, align_h, align_v) = match spec {
+            TextSpec::Simple(text) => (text.as_str(), Align::default(), Align::default()),
+            TextSpec::Complex {
+                text,
+                align_h,
+                align_v,
+                ..
+            } => (
+                text.as_ref().map(String::as_str).unwrap_or_default(),
+                align_h.into_dume(),
+                align_v.into_dume(),
+            ),
         };
         Self {
             text: dume::Text::from_sections([TextSection::Text {
@@ -24,6 +36,8 @@ impl Text {
                 style: Default::default(),
             }]),
             paragraph: None,
+            align_h,
+            align_v,
         }
     }
 
@@ -31,6 +45,8 @@ impl Text {
         Self {
             text,
             paragraph: None,
+            align_h: Align::default(),
+            align_v: Align::default(),
         }
     }
 
@@ -56,8 +72,8 @@ impl Text {
             TextOptions {
                 wrap_lines: true,
                 baseline: Baseline::Top,
-                align_h: Align::Start,
-                align_v: Align::Start,
+                align_h: self.align_h,
+                align_v: self.align_v,
             },
         );
         cx.canvas.context().resize_text_blob(&mut blob, max_size);

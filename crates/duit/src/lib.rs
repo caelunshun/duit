@@ -41,6 +41,20 @@ impl RectExt for Rect {
     }
 }
 
+trait AlignExt {
+    fn into_dume(self) -> dume::Align;
+}
+
+impl AlignExt for Align {
+    fn into_dume(self) -> dume::Align {
+        match self {
+            Align::Start => dume::Align::Start,
+            Align::Center => dume::Align::Center,
+            Align::End => dume::Align::End,
+        }
+    }
+}
+
 /// Constructs a [`WidgetPodHandle`] to the given widget.
 pub fn widget(w: impl Widget) -> WidgetPodHandle {
     Rc::new(RefCell::new(WidgetPod::new(Box::new(w))))
