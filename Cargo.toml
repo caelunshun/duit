@@ -1,9 +1,10 @@
 [workspace]
 members = [
-    "crates/duit",
+   "crates/duit",
     "crates/duit-codegen",
     "crates/duit-core",
     "crates/duit-platform"
+   #"crates/duit-parser"
 ]
 
 resolver = "2"

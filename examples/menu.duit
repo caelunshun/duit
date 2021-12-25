@@ -1,0 +1,85 @@
+enum MenuState {
+    Main,
+    Singleplayer,
+    Multiplayer,
+    Options,
+    SavesList,
+    MultiplayerGamesList,
+}
+
+export component MainMenu {
+    property state: MenuState = MenuState::Main;
+    callback new_game {
+        multiplayer: bool;
+    };
+
+    Image {
+        image: "icon/menu";
+        Center {
+            Container {
+                Column {
+                    align_h: Align::Center;
+                    if state == MenuState::Main {
+                        MenuEntry {
+                            name: translate("menu-singleplayer");
+                            clicked: || state = MenuState::Singleplayer;
+                        }
+                        MenuEntry {
+                            name: translate("menu-multiplayer");
+                            clicked: || state = MenuState::Multiplayer;
+                        }
+                        MenuEntry {
+                            name: translate("menu-options");
+                            clicked: || state = MenuState::Options;
+                        }
+                    }
+                    if state == MenuState::Singleplayer {
+                        MenuEntry {
+                            name: translate("menu-new_game");
+                            clicked: || emit new_game { multiplayer: false; };
+                        }
+                        MenuEntry {
+                            name: translate("menu-load_game");
+                            clicked: || state = MenuState::SavesList;
+                        }
+                    }
+                    if state == MenuState::Multiplayer {
+                        MenuEntry {
+                            name: translate("menu-new_game");
+                            clicked: || emit new_game { multiplayer: true; };
+                        }
+                        MenuEntry {
+                            name: translate("menu-join_game");
+                            clicked: || state = MenuState::MultiplayerGamesList;
+                        }
+                    }
+                }
+            }
+        }
+        Align {
+            align_h: Align::Start;
+            align_v: Align::End;
+            if state != MenuState::Main {
+                Button {
+                    Text {
+                        text: translate("menu-back");
+                    }
+                    clicked: || state = MenuState::Main;
+                }
+            }
+        }
+    }
+}
+
+component MenuEntry {
+    property name: text;
+    callback clicked;
+
+    Clickable {
+        clicked: emit clicked;
+        Text {
+            text: name;
+            classes: hoverable_text;
+        }
+    }
+}
